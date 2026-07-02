@@ -13,39 +13,44 @@
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     }
     .app-shell {
-      padding-top: 38px;
+      padding-top: 48px;
     }
     .app-navbar {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      height: 38px;
+      height: 48px;
       background: rgba(251,248,240,0.95);
       border-bottom: 1px solid #e4dccb;
       box-shadow: 0 8px 20px rgba(32,29,24,0.05);
       z-index: 50;
       display: flex;
       align-items: center;
+      padding: 0 16px;
     }
     .app-navbar .container {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      justify-content: flex-start;
+      gap: 24px;
+      width: 100%;
+      max-width: none;
+      padding: 0;
     }
     .app-navbar-brand {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       font-weight: 700;
       color: #201d18;
       text-decoration: none;
       font-size: 13px;
+      flex-shrink: 0;
     }
     .brand-badge {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -53,24 +58,27 @@
       color: #f5efdf;
       border-radius: 10px;
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 1rem;
     }
     .app-navbar-nav {
       display: flex;
       align-items: center;
-      gap: 10px;
-      flex: 1;
-      justify-content: center;
+      gap: 20px;
+      flex: 0;
+      justify-content: flex-start;
     }
     .app-navbar-nav a {
       color: #201d18;
       text-decoration: none;
       font-weight: 600;
       font-size: 13px;
+      white-space: nowrap;
     }
     .app-navbar-actions {
       display: flex;
       gap: 8px;
+      margin-left: auto;
+      flex-shrink: 0;
     }
     .btn-ghost {
       border: 1px solid rgba(32,29,24,0.12);
