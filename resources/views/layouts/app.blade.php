@@ -13,17 +13,17 @@
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     }
     .app-shell {
-      padding-top: 76px;
+      padding-top: 38px;
     }
     .app-navbar {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      height: 76px;
+      height: 38px;
       background: rgba(251,248,240,0.95);
       border-bottom: 1px solid #e4dccb;
-      box-shadow: 0 10px 30px rgba(32,29,24,0.05);
+      box-shadow: 0 8px 20px rgba(32,29,24,0.05);
       z-index: 50;
       display: flex;
       align-items: center;
@@ -32,31 +32,33 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 10px;
     }
     .app-navbar-brand {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       font-weight: 700;
       color: #201d18;
       text-decoration: none;
+      font-size: 13px;
     }
     .brand-badge {
-      width: 44px;
-      height: 44px;
+      width: 28px;
+      height: 28px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       background: #201d18;
       color: #f5efdf;
-      border-radius: 12px;
+      border-radius: 10px;
       font-weight: 700;
+      font-size: 0.9rem;
     }
     .app-navbar-nav {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
       flex: 1;
       justify-content: center;
     }
@@ -64,19 +66,21 @@
       color: #201d18;
       text-decoration: none;
       font-weight: 600;
+      font-size: 13px;
     }
     .app-navbar-actions {
       display: flex;
-      gap: 12px;
+      gap: 8px;
     }
     .btn-ghost {
       border: 1px solid rgba(32,29,24,0.12);
       background: white;
       color: #201d18;
       border-radius: 12px;
-      padding: 10px 18px;
+      padding: 6px 12px;
       text-decoration: none;
       font-weight: 600;
+      font-size: 12px;
     }
     .btn-ghost:hover,
     .btn-logout:hover {
@@ -87,8 +91,9 @@
       background: white;
       color: #201d18;
       border-radius: 12px;
-      padding: 10px 18px;
+      padding: 6px 12px;
       font-weight: 600;
+      font-size: 12px;
       cursor: pointer;
     }
     .container.body-content {
@@ -105,6 +110,7 @@
       </a>
       <nav class="app-navbar-nav">
         <a href="{{ route('applications.create') }}">Tambah Aplikasi</a>
+        <a href="{{ route('feature-requests.create') }}">Tambah Permintaan</a>
       </nav>
       <div class="app-navbar-actions">
         <form method="POST" action="{{ route('logout') }}" class="m-0">
