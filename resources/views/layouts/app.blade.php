@@ -14,6 +14,14 @@
 <nav class="navbar navbar-light bg-white shadow-sm mb-4">
   <div class="container">
     <a class="navbar-brand fw-bold" href="{{ route('feature-requests.index') }}">Feature Request Board</a>
+    @auth
+      <div class="ms-auto">
+        <form method="POST" action="{{ route('logout') }}">
+          @csrf
+          <button type="submit" class="btn btn-outline-secondary">Logout</button>
+        </form>
+      </div>
+    @endauth
   </div>
 </nav>
 <div class="container py-3">
