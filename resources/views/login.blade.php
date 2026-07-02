@@ -125,7 +125,7 @@
             <span class="brand-label">Changelog</span>
         </div>
         <h1>Selamat Datang di Aplikasi Changelog</h1>
-        <p class="subtitle">Masuk untuk melihat riwayat perubahan, versi, dan catatan rilis terbaru.</p>
+        <p class="subtitle">Masuk untuk melihat riwayat perubahan, versi, dan catatan rilis terbaru pada aplikasi pemerintah kota mataram.</p>
 
         <form action="{{ route('login.submit') }}" method="POST">
             @csrf
@@ -149,7 +149,6 @@
             <button type="submit">Masuk</button>
         </form>
 
-        <p class="footer">v1.0.0 • build stabil</p>
     </section>
 </body>
 </html>
