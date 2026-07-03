@@ -40,12 +40,12 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 540px;
+      max-width: 420px;
       background: rgba(251,248,240,0.85);
       backdrop-filter: blur(6px);
       border: 1px solid var(--border);
       border-radius: 24px;
-      padding: 40px;
+      padding: 24px;
       box-shadow: 0 20px 40px rgba(32,29,24,0.06);
     }
     .page-content .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
@@ -65,12 +65,12 @@
       text-transform: uppercase; letter-spacing: -0.01em;
     }
     .page-content .subtitle { margin-top: 12px; font-size: 14px; line-height: 1.6; color: var(--muted); }
-    .page-content form { margin-top: 32px; display: flex; flex-direction: column; gap: 20px; }
-    .page-content .field { display: flex; flex-direction: column; gap: 8px; }
-    .page-content label { font-size: 14px; font-weight: 500; }
+    .page-content form { margin-top: 0; display: flex; flex-direction: column; gap: 14px; }
+    .page-content .field { display: flex; flex-direction: column; gap: 6px; }
+    .page-content label { font-size: 13px; font-weight: 500; }
     .page-content input, .page-content select, .page-content textarea {
       width: 100%;
-      padding: 12px 16px;
+      padding: 10px 14px;
       font-size: 14px;
       color: var(--ink);
       background: rgba(255,255,255,0.6);
@@ -79,13 +79,13 @@
       outline: none;
       transition: border-color .15s, box-shadow .15s;
     }
-    .page-content textarea { min-height: 140px; resize: vertical; }
+    .page-content textarea { min-height: 100px; resize: vertical; }
     .page-content input:focus, .page-content select:focus, .page-content textarea:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(32,29,24,0.12); }
     .page-content input::placeholder, .page-content textarea::placeholder { color: rgba(122,116,106,0.7); }
     .page-content button[type="submit"] {
-      margin-top: 8px;
+      margin-top: 4px;
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       font-size: 14px; font-weight: 600;
       text-transform: uppercase; letter-spacing: 0.03em;
       color: var(--cream); background: var(--ink);
@@ -109,13 +109,6 @@
 ~ refactor: ui</pre>
 
     <section class="card">
-      <div class="brand">
-        <span class="brand-badge">C</span>
-        <span class="brand-label">Changelog</span>
-      </div>
-      <h1>Tambah Aplikasi</h1>
-      <p class="subtitle">Isi data aplikasi baru untuk ditambahkan ke sistem.</p>
-
       <form action="{{ route('applications.store') }}" method="POST" id="application-form">
         @csrf
         <div class="field">
