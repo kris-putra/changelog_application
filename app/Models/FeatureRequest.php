@@ -11,7 +11,8 @@ class FeatureRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title','slug','description','type','priority','status',
+        'application_id','title','slug','description','detail_perubahan','pemohon_perubahan',
+        'as_is','to_be','klasifikasi_perubahan','type','priority','status',
         'requested_by','assigned_to','metadata','votes_count'
     ];
 
@@ -31,6 +32,11 @@ class FeatureRequest extends Model
     public function requester()
     {
         return $this->belongsTo(User::class, 'requested_by');
+    }
+
+    public function application()
+    {
+        return $this->belongsTo(Application::class);
     }
 
     public function assignee()

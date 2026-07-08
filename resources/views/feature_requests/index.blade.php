@@ -16,7 +16,7 @@
           <div>
             <h5 class="mb-2"><a href="{{ route('feature-requests.show', $r) }}" class="text-decoration-none">{{ $r->title }}</a></h5>
             <p class="mb-2 text-muted">{{ Illuminate\Support\Str::limit($r->description, 160) }}</p>
-            <small class="text-muted">Tipe: {{ strtoupper($r->type) }} • Status: {{ $r->status }} • Prioritas: {{ $r->priority }}</small>
+            <small class="text-muted">Aplikasi: {{ $r->application?->name ?? '-' }} • Tipe: {{ strtoupper($r->type) }} • Status: {{ $r->status }} • Prioritas: {{ $r->priority }}</small>
           </div>
           <span class="badge bg-light text-dark">#{{ $r->id }}</span>
         </div>

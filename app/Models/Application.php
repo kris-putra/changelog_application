@@ -15,4 +15,9 @@ class Application extends Model
         'url',
         'location',
     ];
+
+    public function featureRequests()
+    {
+        return $this->hasMany(FeatureRequest::class);
+    }
 }

@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Application;
 use App\Models\FeatureRequest;
 use App\Http\Requests\StoreFeatureRequest;
-use Illuminate\Http\Request;
 
 class FeatureRequestController extends Controller
 {
     public function index()
     {
-        $requests = FeatureRequest::latest()->paginate(15);
+        $requests = FeatureRequest::with('application')->latest()->paginate(15);
         return view('feature_requests.index', compact('requests'));
     }
 
     public function create()
     {
-        return view('feature_requests.create');
+        $applications = Application::orderBy('name')->get();
+
+        return view('feature_requests.create', compact('applications'));
     }
 
     public function store(StoreFeatureRequest $request)
@@ -29,12 +31,16 @@ class FeatureRequestController extends Controller
 
     public function show(FeatureRequest $featureRequest)
     {
+        $featureRequest->load('application');
+
         return view('feature_requests.show', ['requestItem' => $featureRequest]);
     }
 
     public function edit(FeatureRequest $featureRequest)
     {
-        return view('feature_requests.edit', compact('featureRequest'));
+        $applications = Application::orderBy('name')->get();
+
+        return view('feature_requests.edit', compact('featureRequest', 'applications'));
     }
 
     public function update(StoreFeatureRequest $request, FeatureRequest $featureRequest)
