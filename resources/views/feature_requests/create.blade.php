@@ -164,37 +164,25 @@
             </div>
           </div>
 
-          {{-- Baris 3: Klasifikasi | Tipe | Prioritas (4+4+4) --}}
-          <div class="col-md-4">
+          {{-- Baris 3: Prioritas | Tipe (6+6) --}}
+          <div class="col-md-6">
             <div class="form-group">
-              <label for="klasifikasi_perubahan">Klasifikasi Perubahan</label>
-              <select id="klasifikasi_perubahan" name="klasifikasi_perubahan" class="w-100" required>
-                <option value="Normal" {{ old('klasifikasi_perubahan') == 'Normal' || !old('klasifikasi_perubahan') ? 'selected' : '' }}>Normal</option>
-                <option value="Emergency" {{ old('klasifikasi_perubahan') == 'Emergency' ? 'selected' : '' }}>Emergency</option>
+              <label for="priority">Prioritas</label>
+              <select id="priority" name="priority" class="w-100" required>
+                <option value="low" {{ old('priority') == 'low' ? 'selected' : '' }}>Low</option>
+                <option value="medium" {{ old('priority') == 'medium' || !old('priority') ? 'selected' : '' }}>Medium</option>
+                <option value="urgent" {{ old('priority') == 'urgent' ? 'selected' : '' }}>Urgent</option>
               </select>
-              @error('klasifikasi_perubahan')
-                <div class="error">{{ $message }}</div>
-              @enderror
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <div class="form-group">
               <label for="type">Tipe</label>
               <select id="type" name="type" class="w-100" required>
                 <option value="feature" {{ old('type') == 'feature' ? 'selected' : '' }}>Feature</option>
                 <option value="change" {{ old('type') == 'change' ? 'selected' : '' }}>Change</option>
                 <option value="bug" {{ old('type') == 'bug' ? 'selected' : '' }}>Bug</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="form-group">
-              <label for="priority">Prioritas</label>
-              <select id="priority" name="priority" class="w-100" required>
-                <option value="low" {{ old('priority') == 'low' ? 'selected' : '' }}>Low</option>
-                <option value="medium" {{ old('priority') == 'medium' || !old('priority') ? 'selected' : '' }}>Medium</option>
-                <option value="high" {{ old('priority') == 'high' ? 'selected' : '' }}>High</option>
-                <option value="urgent" {{ old('priority') == 'urgent' ? 'selected' : '' }}>Urgent</option>
+                <option value="incident" {{ old('type') == 'incident' ? 'selected' : '' }}>Incident</option>
               </select>
             </div>
           </div>

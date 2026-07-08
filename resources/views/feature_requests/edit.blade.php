@@ -165,36 +165,23 @@
             </div>
           </div>
 
-          {{-- Baris 3: Klasifikasi | Tipe | Prioritas (4+4+4) --}}
-          <div class="col-md-4">
-            <div class="form-group">
-              <label for="klasifikasi_perubahan">Klasifikasi Perubahan</label>
-              <select id="klasifikasi_perubahan" name="klasifikasi_perubahan" class="w-100" required>
-                @foreach(['Normal' => 'Normal', 'Emergency' => 'Emergency'] as $value => $label)
-                  <option value="{{ $value }}" {{ old('klasifikasi_perubahan', $featureRequest->klasifikasi_perubahan) === $value ? 'selected' : '' }}>{{ $label }}</option>
-                @endforeach
-              </select>
-              @error('klasifikasi_perubahan')
-                <div class="error">{{ $message }}</div>
-              @enderror
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="form-group">
-              <label for="type">Tipe</label>
-              <select id="type" name="type" class="w-100" required>
-                @foreach(['feature' => 'Feature', 'change' => 'Change', 'bug' => 'Bug'] as $value => $label)
-                  <option value="{{ $value }}" {{ old('type', $featureRequest->type) === $value ? 'selected' : '' }}>{{ $label }}</option>
-                @endforeach
-              </select>
-            </div>
-          </div>
-          <div class="col-md-4">
+          {{-- Baris 3: Prioritas | Tipe (6+6) --}}
+          <div class="col-md-6">
             <div class="form-group">
               <label for="priority">Prioritas</label>
               <select id="priority" name="priority" class="w-100" required>
-                @foreach(['low' => 'Low', 'medium' => 'Medium', 'high' => 'High', 'urgent' => 'Urgent'] as $value => $label)
+                @foreach(['low' => 'Low', 'medium' => 'Medium', 'urgent' => 'Urgent'] as $value => $label)
                   <option value="{{ $value }}" {{ old('priority', $featureRequest->priority) === $value ? 'selected' : '' }}>{{ $label }}</option>
+                @endforeach
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="type">Tipe</label>
+              <select id="type" name="type" class="w-100" required>
+                @foreach(['feature' => 'Feature', 'change' => 'Change', 'bug' => 'Bug', 'incident' => 'Incident'] as $value => $label)
+                  <option value="{{ $value }}" {{ old('type', $featureRequest->type) === $value ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
               </select>
             </div>
