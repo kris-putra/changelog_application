@@ -22,7 +22,7 @@ class StoreFeatureRequest extends FormRequest
             'as_is' => 'nullable|string',
             'to_be' => 'nullable|string',
             'klasifikasi_perubahan' => 'required|in:Normal,Emergency',
-            'type' => 'required|in:feature,change,bug',
+            'type' => 'required|in:feature,change,bug,incident',
             'priority' => 'required|in:low,medium,high,urgent',
         ];
     }

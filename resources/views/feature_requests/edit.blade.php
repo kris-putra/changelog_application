@@ -124,6 +124,26 @@
         @method('PUT')
 
         <div class="row g-3">
+          {{-- Baris 0: Read-only fields --}}
+          <div class="col-md-4">
+            <div class="form-group">
+              <label>Request Number</label>
+              <input type="text" class="w-100" value="{{ $featureRequest->request_number }}" disabled />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label>Tanggal Permintaan</label>
+              <input type="text" class="w-100" value="{{ $featureRequest->created_at->format('d M Y H:i') }}" disabled />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label>Status</label>
+              <input type="text" class="w-100" value="{{ $featureRequest->status }}" disabled />
+            </div>
+          </div>
+
           {{-- Baris 1: Aplikasi (full width) --}}
           <div class="col-12">
             <div class="form-group">
@@ -232,7 +252,7 @@
 
         {{-- Baris 7: Tombol --}}
         <div class="btn-row">
-          <a href="{{ route('feature-requests.index') }}" class="btn-secondary">Batal</a>
+          <a href="{{ route('dashboard') }}" class="btn-secondary">Batal</a>
           <button type="submit" id="submit-button" class="btn-primary">Update</button>
         </div>
       </form>

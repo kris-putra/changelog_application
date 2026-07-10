@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Changelog Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
   <style>
     body {
       background: radial-gradient(120% 120% at 15% 10%, #fbf8f0 0%, #f5efdf 45%, #e6dcc4 100%);
@@ -130,11 +131,27 @@
   </header>
   <main class="app-shell">
     <div class="container body-content">
-      @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+      @if(session('toast'))
+        <x-toast
+          :type="session('toast.type', 'success')"
+          :title="session('toast.title', '')"
+          :message="session('toast.message', '')"
+          :extra="session('toast.extra', '')"
+        />
       @endif
       @yield('content')
     </div>
   </main>
+  @if(session('toast'))
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var toastEl = document.getElementById('appToast');
+        if (toastEl) {
+          var toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+          toast.show();
+        }
+      });
+    </script>
+  @endif
 </body>
 </html>

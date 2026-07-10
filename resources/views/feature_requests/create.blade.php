@@ -122,6 +122,17 @@
       <form action="{{ route('feature-requests.store') }}" method="post" id="feature-form">
         @csrf
 
+        @if ($errors->any())
+          <div class="alert alert-danger" style="border-radius:12px; font-size:13px;">
+            <strong>Terdapat kesalahan pada input:</strong>
+            <ul class="mb-0 mt-1">
+              @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+              @endforeach
+            </ul>
+          </div>
+        @endif
+
         <div class="row g-3">
           {{-- Baris 1: Aplikasi (full width) --}}
           <div class="col-12">
@@ -164,7 +175,19 @@
             </div>
           </div>
 
-          {{-- Baris 3: Prioritas | Tipe (6+6) --}}
+          {{-- Baris 3: Klasifikasi Perubahan | Prioritas (6+6) --}}
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="klasifikasi_perubahan">Klasifikasi Perubahan</label>
+              <select id="klasifikasi_perubahan" name="klasifikasi_perubahan" class="w-100" required>
+                <option value="Normal" {{ old('klasifikasi_perubahan') == 'Normal' || !old('klasifikasi_perubahan') ? 'selected' : '' }}>Normal</option>
+                <option value="Emergency" {{ old('klasifikasi_perubahan') == 'Emergency' ? 'selected' : '' }}>Emergency</option>
+              </select>
+              @error('klasifikasi_perubahan')
+                <div class="error">{{ $message }}</div>
+              @enderror
+            </div>
+          </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="priority">Prioritas</label>
@@ -175,19 +198,22 @@
               </select>
             </div>
           </div>
+
+          {{-- Baris 4: Tipe --}}
           <div class="col-md-6">
             <div class="form-group">
               <label for="type">Tipe</label>
               <select id="type" name="type" class="w-100" required>
-                <option value="feature" {{ old('type') == 'feature' ? 'selected' : '' }}>Feature</option>
+                <option value="feature" {{ old('type') == 'feature' || !old('type') ? 'selected' : '' }}>Feature</option>
                 <option value="change" {{ old('type') == 'change' ? 'selected' : '' }}>Change</option>
                 <option value="bug" {{ old('type') == 'bug' ? 'selected' : '' }}>Bug</option>
                 <option value="incident" {{ old('type') == 'incident' ? 'selected' : '' }}>Incident</option>
               </select>
             </div>
           </div>
+          <div class="col-md-6"></div>
 
-          {{-- Baris 4: Deskripsi (full width) --}}
+          {{-- Baris 5: Deskripsi (full width) --}}
           <div class="col-12">
             <div class="form-group">
               <label for="description">Deskripsi</label>
@@ -198,7 +224,7 @@
             </div>
           </div>
 
-          {{-- Baris 5: Detail Perubahan (full width) --}}
+          {{-- Baris 6: Detail Perubahan (full width) --}}
           <div class="col-12">
             <div class="form-group">
               <label for="detail_perubahan">Detail Perubahan</label>
@@ -209,7 +235,7 @@
             </div>
           </div>
 
-          {{-- Baris 6: As-Is | To-Be (6+6) --}}
+          {{-- Baris 7: As-Is | To-Be (6+6) --}}
           <div class="col-md-6">
             <div class="form-group">
               <label for="as_is">As-Is</label>
@@ -230,7 +256,7 @@
           </div>
         </div>
 
-        {{-- Baris 7: Tombol --}}
+        {{-- Tombol --}}
         <div class="btn-row">
           <a href="{{ route('feature-requests.index') }}" class="btn-secondary">Batal</a>
           <button type="submit" id="submit-button" class="btn-primary">Simpan</button>

@@ -11,6 +11,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::resource('feature-requests', FeatureRequestController::class);
+    Route::post('/feature-requests/{featureRequest}/start', [FeatureRequestController::class, 'start'])->name('feature-requests.start');
+    Route::post('/feature-requests/{featureRequest}/cancel', [FeatureRequestController::class, 'cancel'])->name('feature-requests.cancel');
+    Route::post('/feature-requests/{featureRequest}/complete', [FeatureRequestController::class, 'complete'])->name('feature-requests.complete');
     Route::get('/add-application', [App\Http\Controllers\ApplicationController::class, 'create'])->name('applications.create');
     Route::post('/add-application', [App\Http\Controllers\ApplicationController::class, 'store'])->name('applications.store');
 });
