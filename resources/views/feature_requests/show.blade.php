@@ -57,13 +57,6 @@
         <div class="border rounded p-3 bg-light">{{ $requestItem->description }}</div>
       </div>
 
-      @if($requestItem->detail_perubahan)
-      <div class="mb-3">
-        <small class="text-muted d-block">Detail Perubahan</small>
-        <div class="border rounded p-3 bg-light">{{ $requestItem->detail_perubahan }}</div>
-      </div>
-      @endif
-
       @if($requestItem->as_is)
       <div class="mb-3">
         <small class="text-muted d-block">As-Is</small>
@@ -77,11 +70,6 @@
         <div class="border rounded p-3 bg-light">{{ $requestItem->to_be }}</div>
       </div>
       @endif
-
-      <div class="mb-3">
-        <small class="text-muted d-block">Klasifikasi Perubahan</small>
-        <span class="badge {{ $requestItem->klasifikasi_perubahan === 'Emergency' ? 'bg-danger' : 'bg-success' }}">{{ $requestItem->klasifikasi_perubahan ?? 'Normal' }}</span>
-      </div>
     </div>
   </div>
 @endsection

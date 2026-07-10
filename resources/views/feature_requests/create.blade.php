@@ -175,19 +175,7 @@
             </div>
           </div>
 
-          {{-- Baris 3: Klasifikasi Perubahan | Prioritas (6+6) --}}
-          <div class="col-md-6">
-            <div class="form-group">
-              <label for="klasifikasi_perubahan">Klasifikasi Perubahan</label>
-              <select id="klasifikasi_perubahan" name="klasifikasi_perubahan" class="w-100" required>
-                <option value="Normal" {{ old('klasifikasi_perubahan') == 'Normal' || !old('klasifikasi_perubahan') ? 'selected' : '' }}>Normal</option>
-                <option value="Emergency" {{ old('klasifikasi_perubahan') == 'Emergency' ? 'selected' : '' }}>Emergency</option>
-              </select>
-              @error('klasifikasi_perubahan')
-                <div class="error">{{ $message }}</div>
-              @enderror
-            </div>
-          </div>
+          {{-- Baris 3: Prioritas --}}
           <div class="col-md-6">
             <div class="form-group">
               <label for="priority">Prioritas</label>
@@ -224,18 +212,7 @@
             </div>
           </div>
 
-          {{-- Baris 6: Detail Perubahan (full width) --}}
-          <div class="col-12">
-            <div class="form-group">
-              <label for="detail_perubahan">Detail Perubahan</label>
-              <textarea id="detail_perubahan" name="detail_perubahan" class="w-100" placeholder="Detail Perubahan">{{ old('detail_perubahan') }}</textarea>
-              @error('detail_perubahan')
-                <div class="error">{{ $message }}</div>
-              @enderror
-            </div>
-          </div>
-
-          {{-- Baris 7: As-Is | To-Be (6+6) --}}
+          {{-- Baris 6: As-Is | To-Be (6+6) --}}
           <div class="col-md-6">
             <div class="form-group">
               <label for="as_is">As-Is</label>

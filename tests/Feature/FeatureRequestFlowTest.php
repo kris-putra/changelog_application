@@ -46,11 +46,9 @@ class FeatureRequestFlowTest extends TestCase
             'application_id' => $application->id,
             'title' => 'Dashboard KPI tim engineering',
             'description' => 'Butuh dashboard KPI untuk tim engineering.',
-            'detail_perubahan' => 'Detail perubahan test',
             'pemohon_perubahan' => 'John Doe',
             'as_is' => 'Sistem lama',
             'to_be' => 'Sistem baru',
-            'klasifikasi_perubahan' => 'Normal',
             'type' => 'feature',
             'priority' => 'medium',
         ]);

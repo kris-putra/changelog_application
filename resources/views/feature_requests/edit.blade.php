@@ -218,18 +218,7 @@
             </div>
           </div>
 
-          {{-- Baris 5: Detail Perubahan (full width) --}}
-          <div class="col-12">
-            <div class="form-group">
-              <label for="detail_perubahan">Detail Perubahan</label>
-              <textarea id="detail_perubahan" name="detail_perubahan" class="w-100" placeholder="Detail Perubahan">{{ old('detail_perubahan', $featureRequest->detail_perubahan) }}</textarea>
-              @error('detail_perubahan')
-                <div class="error">{{ $message }}</div>
-              @enderror
-            </div>
-          </div>
-
-          {{-- Baris 6: As-Is | To-Be (6+6) --}}
+          {{-- Baris 5: As-Is | To-Be (6+6) --}}
           <div class="col-md-6">
             <div class="form-group">
               <label for="as_is">As-Is</label>

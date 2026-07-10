@@ -12,8 +12,8 @@ class FeatureRequest extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'application_id','title','slug','description','detail_perubahan','pemohon_perubahan',
-        'as_is','to_be','klasifikasi_perubahan','type','priority','status',
+        'application_id','title','slug','description','pemohon_perubahan',
+        'as_is','to_be','type','priority','status',
         'requested_by','assigned_to','metadata','votes_count','request_number',
         'started_at','completed_at'
     ];
