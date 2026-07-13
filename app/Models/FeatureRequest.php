@@ -14,6 +14,7 @@ class FeatureRequest extends Model
     protected $fillable = [
         'application_id','title','slug','description','pemohon_perubahan',
         'as_is','to_be','impact','type','priority','status',
+        'pic','rollback_plan','estimated_finish_at',
 
         'requested_by','assigned_to','metadata','votes_count','request_number',
         'started_at','completed_at'
@@ -23,6 +24,7 @@ class FeatureRequest extends Model
         'metadata' => 'array',
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
+        'estimated_finish_at' => 'datetime',
     ];
 
     private static array $priorityMap = [

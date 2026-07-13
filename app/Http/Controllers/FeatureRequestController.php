@@ -94,6 +94,33 @@ class FeatureRequestController extends Controller
         ]);
     }
 
+    public function saveExecution(Request $request, FeatureRequest $featureRequest)
+    {
+        $validated = $request->validate([
+            'pic' => 'required|string|max:255',
+            'rollback_plan' => 'required|string',
+            'estimated_finish_at' => 'required|date',
+        ]);
+
+        $validated['started_at'] = now();
+        $validated['status'] = 'In Progress';
+
+        $featureRequest->update($validated);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data pelaksanaan berhasil disimpan. Status diubah ke In Progress.',
+            ]);
+        }
+
+        return redirect()->route('dashboard')->with('toast', [
+            'type'    => 'success',
+            'title'   => 'Success',
+            'message' => 'Data pelaksanaan berhasil disimpan. Status diubah ke In Progress.',
+        ]);
+    }
+
     public function cancel(FeatureRequest $featureRequest)
     {
         $featureRequest->update([

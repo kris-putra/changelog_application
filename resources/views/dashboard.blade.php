@@ -361,13 +361,11 @@
                           <i class="bi bi-pencil-square"></i>
                         </a>
                         {{-- Start --}}
-                        <form action="{{ route('feature-requests.start', $r) }}" method="post" class="d-inline">
-                          @csrf
-                          <button type="submit" class="btn btn-link p-0 text-warning border-0"
-                                  data-bs-toggle="tooltip" data-bs-placement="top" title="Start">
-                            <i class="bi bi-play-circle"></i>
-                          </button>
-                        </form>
+                        <button type="button" class="btn btn-link p-0 text-warning border-0"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Start"
+                                onclick="openStartModal({{ $r->id }})">
+                          <i class="bi bi-play-circle"></i>
+                        </button>
                         {{-- Delete --}}
                         <form action="{{ route('feature-requests.destroy', $r) }}" method="post" class="d-inline"
                               id="delete-form-{{ $r->id }}">
@@ -467,6 +465,69 @@
   </div>
   </div>
 
+  {{-- Start Progress Modal --}}
+  <style>
+    /* Start Progress Modal – responsive width */
+    #startProgressModal .modal-dialog {
+      max-width: 760px;
+      width: 100%;
+    }
+    @media (max-width: 991.98px) {
+      #startProgressModal .modal-dialog {
+        max-width: 90vw;
+      }
+    }
+    @media (max-width: 575.98px) {
+      #startProgressModal .modal-dialog {
+        max-width: calc(100vw - 1rem);
+        margin: 0.5rem auto;
+      }
+    }
+    #startProgressModal .modal-header {
+      padding: 24px 24px 16px 24px;
+    }
+    #startProgressModal .modal-body {
+      padding: 0 24px 24px 24px;
+    }
+    #startProgressModal .modal-body .mb-3:last-child {
+      margin-bottom: 0 !important;
+    }
+    #startProgressModal .modal-footer {
+      padding: 16px 24px 20px 24px;
+    }
+  </style>
+  <div class="modal fade" id="startProgressModal" tabindex="-1" aria-labelledby="startProgressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form id="startProgressForm" method="POST" action="">
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title" id="startProgressModalLabel">Data Pelaksanaan</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="start-pic" class="form-label fw-semibold">PIC <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="start-pic" name="pic" placeholder="Nama PIC yang bertanggung jawab." required>
+            </div>
+            <div class="mb-3">
+              <label for="start-rollback" class="form-label fw-semibold">Rollback Plan <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="start-rollback" name="rollback_plan" rows="6" placeholder="Langkah untuk mengembalikan sistem jika implementasi gagal." required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="start-estimasi" class="form-label fw-semibold">Estimasi Selesai <span class="text-danger">*</span></label>
+              <input type="datetime-local" class="form-control" id="start-estimasi" name="estimated_finish_at" required>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-end">
+            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-warning px-4" id="confirmStartBtn">Mulai</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   {{-- Delete Confirmation Modal --}}
 
   <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
@@ -496,6 +557,123 @@
       tooltipTriggerList.forEach(function (el) {
         new bootstrap.Tooltip(el);
       });
+    });
+
+    // Start Progress Modal
+    var startModal = null;
+
+    function openStartModal(id) {
+      var form = document.getElementById('startProgressForm');
+      form.action = '/feature-requests/' + id + '/save-execution';
+      form.reset();
+      if (!startModal) {
+        startModal = new bootstrap.Modal(document.getElementById('startProgressModal'));
+      }
+      startModal.show();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var startForm = document.getElementById('startProgressForm');
+      var startBtn = document.getElementById('confirmStartBtn');
+      var cancelBtn = startForm.querySelector('[data-bs-dismiss="modal"]');
+
+      startBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (!startForm.checkValidity()) {
+          startForm.reportValidity();
+          return;
+        }
+
+        // Prevent double submission
+        startBtn.disabled = true;
+        startBtn.textContent = 'Menyimpan...';
+        if (cancelBtn) cancelBtn.disabled = true;
+
+        var formData = new FormData(startForm);
+
+        fetch(startForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+              ? document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              : formData.get('_token'),
+          },
+        })
+          .then(function (response) {
+            if (response.ok) {
+              return response.json();
+            }
+            return response.json().then(function (err) {
+              var msg = 'Terjadi kesalahan validasi.';
+              if (err.errors) {
+                msg = Object.values(err.errors).map(function (e) { return e[0]; }).join('\n');
+              } else if (err.message) {
+                msg = err.message;
+              }
+              throw new Error(msg);
+            });
+          })
+          .then(function (data) {
+            if (data.success) {
+              // Store toast for after reload
+              sessionStorage.setItem('toast_data', JSON.stringify({
+                type: 'success',
+                title: 'Success',
+                message: data.message,
+              }));
+              // Close modal then reload
+              startModal.hide();
+              window.location.reload();
+            } else {
+              alert(data.message || 'Terjadi kesalahan.');
+              resetStartBtn();
+            }
+          })
+          .catch(function (err) {
+            alert(err.message || 'Terjadi kesalahan jaringan. Silakan coba lagi.');
+            resetStartBtn();
+          });
+      });
+
+      function resetStartBtn() {
+        startBtn.disabled = false;
+        startBtn.textContent = 'Mulai';
+        if (cancelBtn) cancelBtn.disabled = false;
+      }
+
+      var startModalEl = document.getElementById('startProgressModal');
+      startModalEl.addEventListener('hidden.bs.modal', function () {
+        startForm.reset();
+        resetStartBtn();
+      });
+
+      // Show toast from sessionStorage after page reload
+      var pendingToast = sessionStorage.getItem('toast_data');
+      if (pendingToast) {
+        sessionStorage.removeItem('toast_data');
+        try {
+          var toastData = JSON.parse(pendingToast);
+          var toastContainer = document.createElement('div');
+          toastContainer.className = 'position-fixed top-0 end-0 p-3';
+          toastContainer.style.zIndex = '1080';
+          toastContainer.innerHTML =
+            '<div id="appToast" class="toast align-items-center bg-success text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">' +
+              '<div class="d-flex">' +
+                '<div class="toast-body">' +
+                  '<strong class="me-1">' + (toastData.title || 'Success') + '</strong> ' +
+                  (toastData.message || '') +
+                '</div>' +
+                '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
+              '</div>' +
+            '</div>';
+          document.body.appendChild(toastContainer);
+          var toastEl = toastContainer.querySelector('.toast');
+          var bsToast = new bootstrap.Toast(toastEl, { delay: 5000 });
+          bsToast.show();
+        } catch (e) { /* ignore parse errors */ }
+      }
     });
 
     // Delete confirmation via Bootstrap Modal

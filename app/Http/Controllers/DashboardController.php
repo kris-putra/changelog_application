@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $inProgressCount = FeatureRequest::where('status', 'In Progress')->count();
         $completedCount = FeatureRequest::where('status', 'Completed')->count();
         $totalApplications = Application::count();
-        $applications = Application::latest()->get();
+        $applications = Application::latest()->limit(10)->get();
 
         $query = FeatureRequest::with('application');
 
@@ -109,7 +109,7 @@ class DashboardController extends Controller
             $cycleLabels['status'] = $statusCycles[$cycle % 3];
         }
 
-        $requests = $query->get();
+        $requests = $query->limit(15)->get();
 
         return view('dashboard', compact(
             'totalRequests', 'openCount', 'inProgressCount', 'completedCount', 'requests',

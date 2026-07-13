@@ -16,6 +16,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/feature-requests/{featureRequest}/start', [FeatureRequestController::class, 'start'])->name('feature-requests.start');
     Route::post('/feature-requests/{featureRequest}/cancel', [FeatureRequestController::class, 'cancel'])->name('feature-requests.cancel');
     Route::post('/feature-requests/{featureRequest}/complete', [FeatureRequestController::class, 'complete'])->name('feature-requests.complete');
+    Route::post('/feature-requests/{featureRequest}/save-execution', [FeatureRequestController::class, 'saveExecution'])->name('feature-requests.save-execution');
     Route::get('/add-application', [App\Http\Controllers\ApplicationController::class, 'create'])->name('applications.create');
     Route::post('/add-application', [App\Http\Controllers\ApplicationController::class, 'store'])->name('applications.store');
     Route::get('/applications/{application}/edit', [App\Http\Controllers\ApplicationController::class, 'edit'])->name('applications.edit');
