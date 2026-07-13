@@ -69,7 +69,10 @@
       flex: 0;
       justify-content: flex-start;
     }
-    .app-navbar-nav a {
+    .app-navbar-nav a,
+    .app-navbar-actions a {
+      display: inline-flex;
+      align-items: center;
       color: #201d18;
       text-decoration: none;
       font-weight: 600;
@@ -78,6 +81,7 @@
     }
     .app-navbar-actions {
       display: flex;
+      align-items: center;
       gap: 8px;
       margin-left: auto;
       flex-shrink: 0;
@@ -126,7 +130,7 @@
         @endif
       </nav>
       <div class="app-navbar-actions">
-        <a href="{{ route('settings.index') }}" class="btn-ghost">Pengaturan</a>
+        <a href="{{ route('settings.index') }}"><i class="bi bi-gear-fill me-1"></i>Pengaturan</a>
         <form method="POST" action="{{ route('logout') }}" class="m-0">
           @csrf
           <button type="submit" class="btn-logout">Logout</button>
