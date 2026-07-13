@@ -9,8 +9,12 @@
   <div class="card-body p-4">
     <table class="table mb-0" style="font-size:13px;">
       <tr>
-        <th style="width:200px;color:#6c757d;font-weight:600;">Name</th>
-        <td>{{ $user->name }}</td>
+        <th style="width:200px;color:#6c757d;font-weight:600;">Username</th>
+        <td>{{ $user->username }}</td>
+      </tr>
+      <tr>
+        <th style="width:200px;color:#6c757d;font-weight:600;">Nama Tampilan</th>
+        <td>{{ $user->profile_name ?? '-' }}</td>
       </tr>
       <tr>
         <th style="color:#6c757d;font-weight:600;">Email</th>

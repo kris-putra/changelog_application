@@ -15,7 +15,7 @@
         <thead>
           <tr style="background:#f5efdf;">
             <th class="px-3 py-2" style="font-weight:700;font-size:12px;color:#201d18;">No</th>
-            <th class="px-3 py-2" style="font-weight:700;font-size:12px;color:#201d18;">Name</th>
+            <th class="px-3 py-2" style="font-weight:700;font-size:12px;color:#201d18;">Username</th>
             <th class="px-3 py-2" style="font-weight:700;font-size:12px;color:#201d18;">Email</th>
             <th class="px-3 py-2" style="font-weight:700;font-size:12px;color:#201d18;">Role</th>
             <th class="px-3 py-2 text-center" style="font-weight:700;font-size:12px;color:#201d18;">Aksi</th>
@@ -25,7 +25,7 @@
           @forelse($users as $i => $user)
             <tr>
               <td class="px-3">{{ $i + 1 }}</td>
-              <td class="px-3">{{ $user->name }}</td>
+              <td class="px-3">{{ $user->username }}</td>
               <td class="px-3">{{ $user->email }}</td>
               <td class="px-3">
                 <span class="badge" style="background:#e4dccb;color:#201d18;font-weight:600;font-size:11px;">{{ $user->role->name ?? '-' }}</span>

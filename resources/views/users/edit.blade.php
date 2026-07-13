@@ -11,9 +11,14 @@
       @csrf
       @method('PUT')
       <div class="mb-3">
-        <label for="name" class="form-label" style="font-weight:600;font-size:13px;">Name</label>
-        <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name) }}" required>
-        @error('name')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+        <label for="username" class="form-label" style="font-weight:600;font-size:13px;">Username</label>
+        <input type="text" class="form-control" id="username" name="username" value="{{ old('username', $user->username) }}" required>
+        @error('username')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+      </div>
+      <div class="mb-3">
+        <label for="profile_name" class="form-label" style="font-weight:600;font-size:13px;">Nama Tampilan <span class="text-muted">(opsional)</span></label>
+        <input type="text" class="form-control" id="profile_name" name="profile_name" value="{{ old('profile_name', $user->profile_name) }}">
+        @error('profile_name')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
       </div>
       <div class="mb-3">
         <label for="email" class="form-label" style="font-weight:600;font-size:13px;">Email</label>

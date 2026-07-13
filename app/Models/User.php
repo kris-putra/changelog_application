@@ -13,7 +13,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name','email','password','role_id'
+        'username','email','password','role_id','profile_name'
     ];
 
     protected $hidden = [
@@ -24,9 +24,23 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected static function booted()
+    {
+        static::saving(function ($model) {
+            if ($model->username) {
+                $model->username = strtolower(str_replace(' ', '', $model->username));
+            }
+        });
+    }
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function displayName(): string
+    {
+        return $this->profile_name ?? $this->username;
     }
 
     public function isAdmin(): bool

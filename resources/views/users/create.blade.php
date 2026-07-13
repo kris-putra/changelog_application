@@ -10,9 +10,9 @@
     <form method="POST" action="{{ route('users.store') }}">
       @csrf
       <div class="mb-3">
-        <label for="name" class="form-label" style="font-weight:600;font-size:13px;">Name</label>
-        <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
-        @error('name')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+        <label for="username" class="form-label" style="font-weight:600;font-size:13px;">Username</label>
+        <input type="text" class="form-control" id="username" name="username" value="{{ old('username') }}" required>
+        @error('username')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
       </div>
       <div class="mb-3">
         <label for="email" class="form-label" style="font-weight:600;font-size:13px;">Email</label>

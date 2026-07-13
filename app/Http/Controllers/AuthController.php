@@ -27,7 +27,7 @@ class AuthController extends Controller
         ]);
 
         $credentials = [
-            'name' => $request->input('username'),
+            'username' => strtolower($request->input('username')),
             'password' => $request->input('password'),
         ];
 

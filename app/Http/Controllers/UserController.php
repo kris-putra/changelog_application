@@ -24,12 +24,16 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'username' => ['required','string','max:255','unique:users,username','regex:/^[a-zA-Z0-9_.\-]+$/'],
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'role_id' => 'required|exists:roles,id',
+        ], [
+            'username.unique' => 'Username sudah digunakan. Silakan gunakan username lain.',
+            'username.regex' => 'Username hanya boleh berisi huruf, angka, underscore (_), dash (-), dan titik (.) tanpa spasi.',
         ]);
 
+        $validated['username'] = strtolower($validated['username']);
         $validated['password'] = Hash::make($validated['password']);
 
         User::create($validated);
@@ -50,11 +54,17 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'username' => ['required','string','max:255','unique:users,username,' . $user->id,'regex:/^[a-zA-Z0-9_.\-]+$/'],
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'profile_name' => 'nullable|string|max:255',
             'password' => 'nullable|string|min:6|confirmed',
             'role_id' => 'required|exists:roles,id',
+        ], [
+            'username.unique' => 'Username sudah digunakan. Silakan gunakan username lain.',
+            'username.regex' => 'Username hanya boleh berisi huruf, angka, underscore (_), dash (-), dan titik (.) tanpa spasi.',
         ]);
+
+        $validated['username'] = strtolower($validated['username']);
 
         if (!empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
