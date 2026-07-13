@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Application;
 use App\Models\FeatureRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,8 +15,11 @@ class DashboardController extends Controller
         $openCount = FeatureRequest::where('status', 'Open')->count();
         $inProgressCount = FeatureRequest::where('status', 'In Progress')->count();
         $completedCount = FeatureRequest::where('status', 'Completed')->count();
+        $totalApplications = Application::count();
+        $applications = Application::latest()->get();
 
         $query = FeatureRequest::with('application');
+
 
         $sort = $request->query('sort');
         $order = $request->query('order', 'asc');
@@ -109,7 +113,8 @@ class DashboardController extends Controller
 
         return view('dashboard', compact(
             'totalRequests', 'openCount', 'inProgressCount', 'completedCount', 'requests',
-            'sort', 'order', 'cycle', 'cycleLabels'
+            'sort', 'order', 'cycle', 'cycleLabels', 'totalApplications', 'applications'
         ));
+
     }
 }

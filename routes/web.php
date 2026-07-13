@@ -18,6 +18,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/feature-requests/{featureRequest}/complete', [FeatureRequestController::class, 'complete'])->name('feature-requests.complete');
     Route::get('/add-application', [App\Http\Controllers\ApplicationController::class, 'create'])->name('applications.create');
     Route::post('/add-application', [App\Http\Controllers\ApplicationController::class, 'store'])->name('applications.store');
+    Route::get('/applications/{application}/edit', [App\Http\Controllers\ApplicationController::class, 'edit'])->name('applications.edit');
+    Route::put('/applications/{application}', [App\Http\Controllers\ApplicationController::class, 'update'])->name('applications.update');
+    Route::delete('/applications/{application}', [App\Http\Controllers\ApplicationController::class, 'destroy'])->name('applications.destroy');
+
 
     // User Management (admin only)
     Route::middleware('role:administrator')->group(function () {

@@ -25,10 +25,28 @@
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
       overflow: hidden;
+      height: 560px;
+      display: flex;
+      flex-direction: column;
     }
     .table-card .card-body {
       padding: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
+    .table-scroll {
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
+    }
+    .table-scroll thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
 
     /* Table */
     .dashboard-table {
@@ -68,6 +86,10 @@
     .col-status   { width: 8%; text-align: center; }
     .col-date     { width: 10%; }
     .col-actions  { width: 8%; text-align: center; }
+    .col-app-name { width: 35%; }
+    .col-app-url  { width: 30%; }
+    .col-app-date { width: 20%; }
+
 
     /* Action icons */
     .action-icons {
@@ -158,7 +180,7 @@
 
   {{-- Summary Cards --}}
   <div class="row g-3 mb-4">
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg col-md-6 col-12">
       <div class="card summary-card text-center">
         <div class="card-body">
           <div>
@@ -168,7 +190,7 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg col-md-6 col-12">
       <div class="card summary-card text-center">
         <div class="card-body">
           <div>
@@ -178,7 +200,7 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg col-md-6 col-12">
       <div class="card summary-card text-center">
         <div class="card-body">
           <div>
@@ -188,7 +210,7 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg col-md-6 col-12">
       <div class="card summary-card text-center">
         <div class="card-body">
           <div>
@@ -198,16 +220,33 @@
         </div>
       </div>
     </div>
+    <div class="col-lg col-md-6 col-12">
+      <div class="card summary-card text-center">
+        <div class="card-body">
+          <div>
+            <h6 class="text-muted mb-1">Applications</h6>
+            <h2 class="mb-0 fw-bold text-dark">{{ $totalApplications }}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
+
+
+  <div class="row g-3 mb-3">
   {{-- Feature Request Table --}}
+  <div class="col-12">
   <div class="card table-card">
+
     <div class="card-body">
       @if($requests->isEmpty())
         <div class="alert alert-info mb-0 m-4">Belum ada Feature Request.</div>
       @else
-        <div class="table-responsive">
+        <div class="table-responsive table-scroll">
           <table class="table dashboard-table align-middle">
+
+
             <thead>
               @php
                 $sortableCols = [
@@ -368,8 +407,68 @@
       @endif
     </div>
   </div>
+  </div>
+
+  </div>
+
+  <div class="row g-3">
+  {{-- Daftar Aplikasi --}}
+  <div class="col-12">
+  <div class="card table-card">
+
+    <div class="card-body">
+      @if($applications->isEmpty())
+        <div class="alert alert-info mb-0 m-4">Belum ada Aplikasi.</div>
+      @else
+        <div class="table-responsive table-scroll">
+          <table class="table dashboard-table align-middle">
+            <thead>
+              <tr>
+                <th class="col-app-name">Nama Aplikasi</th>
+                <th class="col-app-url">URL</th>
+                <th class="col-app-date">Tanggal Dibuat</th>
+                {{-- Future Ready: kolom "Website Status" (Online/Offline/Maintenance) dapat ditambahkan di sini --}}
+                <th class="col-actions text-center">Aksi</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @foreach($applications as $app)
+                <tr>
+                  <td class="fw-semibold">{{ $app->name }}</td>
+                  <td>{{ $app->url }}</td>
+                  <td>{{ $app->created_at->format('d M Y') }}</td>
+                  <td>
+                    <div class="action-icons">
+                      <a href="{{ route('applications.edit', $app) }}"
+                         class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                        <i class="bi bi-pencil-square"></i>
+                      </a>
+                      <form action="{{ route('applications.destroy', $app) }}" method="post" class="d-inline"
+                            id="delete-app-form-{{ $app->id }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" class="btn btn-link p-0 text-danger border-0"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
+                                onclick="confirmDeleteApp({{ $app->id }})">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+      @endif
+    </div>
+  </div>
+  </div>
+  </div>
 
   {{-- Delete Confirmation Modal --}}
+
   <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -418,5 +517,27 @@
         }
       });
     });
+
+    // Delete confirmation for Applications (reuses the same modal)
+    var deleteAppFormId = null;
+
+    function confirmDeleteApp(id) {
+      deleteAppFormId = id;
+      deleteFormId = null;
+      if (!deleteModal) {
+        deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+      }
+      deleteModal.show();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+        if (deleteAppFormId) {
+          document.getElementById('delete-app-form-' + deleteAppFormId).submit();
+          deleteAppFormId = null;
+        }
+      });
+    });
   </script>
 @endsection
+
