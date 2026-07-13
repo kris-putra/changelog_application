@@ -121,8 +121,12 @@
       <nav class="app-navbar-nav">
         <a href="{{ route('applications.create') }}">Tambah Aplikasi</a>
         <a href="{{ route('feature-requests.create') }}">Tambah Permintaan</a>
+        @if(auth()->user()->isAdmin())
+          <a href="{{ route('users.index') }}">Kelola User</a>
+        @endif
       </nav>
       <div class="app-navbar-actions">
+        <a href="{{ route('settings.index') }}" class="btn-ghost">Pengaturan</a>
         <form method="POST" action="{{ route('logout') }}" class="m-0">
           @csrf
           <button type="submit" class="btn-logout">Logout</button>
