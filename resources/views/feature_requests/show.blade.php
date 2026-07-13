@@ -77,6 +77,31 @@
         <div class="border rounded p-3 bg-light">{{ $requestItem->impact }}</div>
       </div>
       @endif
+
+      @if(in_array($requestItem->status, ['In Progress', 'Completed']))
+      <hr class="my-4">
+      <h5 class="mb-3">Data Pelaksanaan</h5>
+
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <small class="text-muted d-block">PIC</small>
+          <strong>{{ $requestItem->pic ?? '-' }}</strong>
+        </div>
+        <div class="col-md-4">
+          <small class="text-muted d-block">Tanggal Mulai</small>
+          <strong>{{ $requestItem->started_at ? $requestItem->started_at->format('d M Y H:i') : '-' }}</strong>
+        </div>
+        <div class="col-md-4">
+          <small class="text-muted d-block">Estimasi Selesai</small>
+          <strong>{{ $requestItem->estimated_finish_at ? $requestItem->estimated_finish_at->format('d M Y H:i') : '-' }}</strong>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <small class="text-muted d-block">Rollback Plan</small>
+        <div class="border rounded p-3 bg-light" style="white-space: pre-wrap;">{{ $requestItem->rollback_plan ?? '-' }}</div>
+      </div>
+      @endif
     </div>
 
   </div>
