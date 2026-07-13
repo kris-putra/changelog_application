@@ -107,7 +107,7 @@
       cursor: pointer;
     }
     .container.body-content {
-      max-width: 1040px;
+      max-width: 1280px;
       padding: 24px 16px 40px;
     }
   </style>
