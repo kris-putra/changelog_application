@@ -16,7 +16,7 @@ class StoreApplicationRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'url' => ['required', 'string', 'max:255', 'unique:applications,url'],
+            'url' => ['required', 'string', 'max:255', 'unique:applications,url', 'regex:/^[a-zA-Z0-9]([a-zA-Z0-9\-]*\.)+[a-zA-Z]{2,}$/'],
             'location' => ['required', 'string', 'in:Local Server,PDNS Server,Third Party'],
         ];
     }

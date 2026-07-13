@@ -16,6 +16,15 @@ class Application extends Model
         'location',
     ];
 
+    protected static function booted()
+    {
+        static::saving(function ($model) {
+            if ($model->url) {
+                $model->url = strtolower(preg_replace('#^https?://(www\.)?#', '', rtrim($model->url, '/')));
+            }
+        });
+    }
+
     public function featureRequests()
     {
         return $this->hasMany(FeatureRequest::class);

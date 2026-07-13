@@ -127,7 +127,7 @@
         </div>
         <div class="field">
           <label for="url">URL</label>
-          <input id="url" name="url" type="url" placeholder="https://example.com" value="{{ old('url') }}" required />
+          <input id="url" name="url" type="text" placeholder="contoh: example.com" value="{{ old('url') }}" required />
           @error('url')
             <div class="error">{{ $message }}</div>
           @enderror
