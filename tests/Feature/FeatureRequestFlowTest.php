@@ -49,7 +49,9 @@ class FeatureRequestFlowTest extends TestCase
             'pemohon_perubahan' => 'John Doe',
             'as_is' => 'Sistem lama',
             'to_be' => 'Sistem baru',
+            'impact' => 'Tidak ada dampak',
             'type' => 'feature',
+
             'priority' => 'medium',
         ]);
 

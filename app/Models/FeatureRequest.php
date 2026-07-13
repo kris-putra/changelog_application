@@ -13,7 +13,8 @@ class FeatureRequest extends Model
 
     protected $fillable = [
         'application_id','title','slug','description','pemohon_perubahan',
-        'as_is','to_be','type','priority','status',
+        'as_is','to_be','impact','type','priority','status',
+
         'requested_by','assigned_to','metadata','votes_count','request_number',
         'started_at','completed_at'
     ];

@@ -216,7 +216,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="as_is">As-Is</label>
-              <textarea id="as_is" name="as_is" class="w-100" placeholder="As-Is">{{ old('as_is') }}</textarea>
+              <textarea id="as_is" name="as_is" class="w-100" placeholder="Jelaskan kondisi saat ini sebelum perubahan.">{{ old('as_is') }}</textarea>
               @error('as_is')
                 <div class="error">{{ $message }}</div>
               @enderror
@@ -225,13 +225,25 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="to_be">To-Be</label>
-              <textarea id="to_be" name="to_be" class="w-100" placeholder="To-Be">{{ old('to_be') }}</textarea>
+              <textarea id="to_be" name="to_be" class="w-100" placeholder="Jelaskan kondisi yang diharapkan setelah perubahan diterapkan.">{{ old('to_be') }}</textarea>
               @error('to_be')
                 <div class="error">{{ $message }}</div>
               @enderror
             </div>
           </div>
+
+          {{-- Baris 7: Dampak Perubahan (full width) --}}
+          <div class="col-12">
+            <div class="form-group">
+              <label for="impact">Dampak Perubahan</label>
+              <textarea id="impact" name="impact" class="w-100" placeholder="Jelaskan dampak perubahan terhadap layanan, pengguna, atau sistem selama implementasi. Jika tidak ada dampak, tuliskan &quot;Tidak ada dampak&quot;." required>{{ old('impact') }}</textarea>
+              @error('impact')
+                <div class="error">{{ $message }}</div>
+              @enderror
+            </div>
+          </div>
         </div>
+
 
         {{-- Tombol --}}
         <div class="btn-row">

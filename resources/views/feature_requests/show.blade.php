@@ -70,6 +70,14 @@
         <div class="border rounded p-3 bg-light">{{ $requestItem->to_be }}</div>
       </div>
       @endif
+
+      @if($requestItem->impact)
+      <div class="mb-3">
+        <small class="text-muted d-block">Dampak Perubahan</small>
+        <div class="border rounded p-3 bg-light">{{ $requestItem->impact }}</div>
+      </div>
+      @endif
     </div>
+
   </div>
 @endsection
