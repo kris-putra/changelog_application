@@ -387,13 +387,11 @@
                           </button>
                         </form>
                         {{-- Completed --}}
-                        <form action="{{ route('feature-requests.complete', $r) }}" method="post" class="d-inline">
-                          @csrf
-                          <button type="submit" class="btn btn-link p-0 text-success border-0"
-                                  data-bs-toggle="tooltip" data-bs-placement="top" title="Completed">
-                            <i class="bi bi-check-circle"></i>
-                          </button>
-                        </form>
+                        <button type="button" class="btn btn-link p-0 text-success border-0"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Completed"
+                                onclick="openCompleteModal({{ $r->id }})">
+                          <i class="bi bi-check-circle"></i>
+                        </button>
                       @endif
                     </div>
                   </td>
@@ -522,6 +520,61 @@
           <div class="modal-footer justify-content-end">
             <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
             <button type="submit" class="btn btn-warning px-4" id="confirmStartBtn">Mulai</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {{-- Completed Modal --}}
+  <style>
+    /* Completed Modal – responsive width */
+    #completeModal .modal-dialog {
+      max-width: 760px;
+      width: 100%;
+    }
+    @media (max-width: 991.98px) {
+      #completeModal .modal-dialog {
+        max-width: 90vw;
+      }
+    }
+    @media (max-width: 575.98px) {
+      #completeModal .modal-dialog {
+        max-width: calc(100vw - 1rem);
+        margin: 0.5rem auto;
+      }
+    }
+    #completeModal .modal-header {
+      padding: 24px 24px 16px 24px;
+    }
+    #completeModal .modal-body {
+      padding: 0 24px 24px 24px;
+    }
+    #completeModal .modal-body .mb-3:last-child {
+      margin-bottom: 0 !important;
+    }
+    #completeModal .modal-footer {
+      padding: 16px 24px 20px 24px;
+    }
+  </style>
+  <div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form id="completeForm" method="POST" action="">
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title" id="completeModalLabel">Selesaikan Perubahan</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="complete-lesson" class="form-label fw-semibold">Lesson Learned <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="complete-lesson" name="lesson_learned" rows="5" placeholder="Tuliskan pembelajaran, kendala, atau rekomendasi setelah perubahan selesai." required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-end">
+            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success px-4" id="confirmCompleteBtn">Selesai</button>
           </div>
         </form>
       </div>
@@ -714,6 +767,100 @@
           document.getElementById('delete-app-form-' + deleteAppFormId).submit();
           deleteAppFormId = null;
         }
+      });
+    });
+
+    // Complete Modal
+    var completeModal = null;
+
+    function openCompleteModal(id) {
+      var form = document.getElementById('completeForm');
+      form.action = '/feature-requests/' + id + '/complete';
+      form.reset();
+      if (!completeModal) {
+        completeModal = new bootstrap.Modal(document.getElementById('completeModal'));
+      }
+      completeModal.show();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var completeForm = document.getElementById('completeForm');
+      var completeBtn = document.getElementById('confirmCompleteBtn');
+      var completeCancelBtn = completeForm.querySelector('[data-bs-dismiss="modal"]');
+      var lessonField = document.getElementById('complete-lesson');
+
+      completeBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        // Validate lesson_learned
+        if (!lessonField.value.trim()) {
+          lessonField.setCustomValidity('Lesson Learned wajib diisi.');
+          completeForm.reportValidity();
+          lessonField.setCustomValidity('');
+          return;
+        }
+
+        // Prevent double submission
+        completeBtn.disabled = true;
+        completeBtn.textContent = 'Menyimpan...';
+        if (completeCancelBtn) completeCancelBtn.disabled = true;
+
+        var formData = new FormData(completeForm);
+
+        fetch(completeForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+              ? document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              : formData.get('_token'),
+          },
+        })
+          .then(function (response) {
+            if (response.ok) {
+              return response.json();
+            }
+            return response.json().then(function (err) {
+              var msg = 'Terjadi kesalahan validasi.';
+              if (err.errors) {
+                msg = Object.values(err.errors).map(function (e) { return e[0]; }).join('\n');
+              } else if (err.message) {
+                msg = err.message;
+              }
+              throw new Error(msg);
+            });
+          })
+          .then(function (data) {
+            if (data.success) {
+              sessionStorage.setItem('toast_data', JSON.stringify({
+                type: 'success',
+                title: 'Success',
+                message: data.message,
+              }));
+              completeModal.hide();
+              window.location.reload();
+            } else {
+              alert(data.message || 'Terjadi kesalahan.');
+              resetCompleteBtn();
+            }
+          })
+          .catch(function (err) {
+            alert(err.message || 'Terjadi kesalahan jaringan. Silakan coba lagi.');
+            resetCompleteBtn();
+          });
+      });
+
+      function resetCompleteBtn() {
+        completeBtn.disabled = false;
+        completeBtn.textContent = 'Selesai';
+        if (completeCancelBtn) completeCancelBtn.disabled = false;
+      }
+
+      var completeModalEl = document.getElementById('completeModal');
+      completeModalEl.addEventListener('hidden.bs.modal', function () {
+        completeForm.reset();
+        resetCompleteBtn();
       });
     });
   </script>

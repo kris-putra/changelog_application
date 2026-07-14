@@ -102,6 +102,23 @@
         <div class="border rounded p-3 bg-light" style="white-space: pre-wrap;">{{ $requestItem->rollback_plan ?? '-' }}</div>
       </div>
       @endif
+
+      @if($requestItem->status === 'Completed')
+      <hr class="my-4">
+      <h5 class="mb-3">Data Penyelesaian</h5>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <small class="text-muted d-block">Tanggal Selesai</small>
+          <strong>{{ $requestItem->completed_at ? $requestItem->completed_at->format('d M Y H:i') : '-' }}</strong>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <small class="text-muted d-block">Lesson Learned</small>
+        <div class="border rounded p-3 bg-light" style="white-space: pre-wrap;">{{ $requestItem->lesson_learned ?? '-' }}</div>
+      </div>
+      @endif
     </div>
 
   </div>

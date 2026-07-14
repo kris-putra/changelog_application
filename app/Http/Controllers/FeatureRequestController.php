@@ -135,17 +135,28 @@ class FeatureRequestController extends Controller
         ]);
     }
 
-    public function complete(FeatureRequest $featureRequest)
+    public function complete(Request $request, FeatureRequest $featureRequest)
     {
-        $featureRequest->update([
-            'status' => 'Completed',
-            'completed_at' => now(),
+        $validated = $request->validate([
+            'lesson_learned' => 'required|string',
         ]);
+
+        $validated['status'] = 'Completed';
+        $validated['completed_at'] = now();
+
+        $featureRequest->update($validated);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Perubahan berhasil diselesaikan.',
+            ]);
+        }
 
         return redirect()->route('dashboard')->with('toast', [
             'type'    => 'success',
             'title'   => 'Success',
-            'message' => 'Permintaan diselesaikan.',
+            'message' => 'Perubahan berhasil diselesaikan.',
         ]);
     }
 }

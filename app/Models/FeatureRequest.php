@@ -17,7 +17,7 @@ class FeatureRequest extends Model
         'pic','rollback_plan','estimated_finish_at',
 
         'requested_by','assigned_to','metadata','votes_count','request_number',
-        'started_at','completed_at'
+        'started_at','completed_at','lesson_learned'
     ];
 
     protected $casts = [
