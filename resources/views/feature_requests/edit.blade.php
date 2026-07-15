@@ -119,7 +119,7 @@
 ~ refactor: ui</pre>
 
     <section class="card">
-      <form action="{{ route('feature-requests.update', $featureRequest) }}" method="post" id="feature-form">
+      <form action="{{ route('feature-requests.update', $featureRequest) }}" method="post" id="feature-form" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -242,8 +242,25 @@
           <div class="col-12">
             <div class="form-group">
               <label for="impact">Dampak Perubahan</label>
-              <textarea id="impact" name="impact" class="w-100" placeholder="Jelaskan dampak perubahan terhadap layanan, pengguna, atau sistem selama implementasi. Jika tidak ada dampak, tuliskan &quot;Tidak ada dampak&quot;." required>{{ old('impact', $featureRequest->impact) }}</textarea>
+              <textarea id="impact" name="impact" class="w-100" placeholder="Jelaskan dampak perubahan terhadap layanan, pengguna, atau sistem selama implementasi. Jika tidak ada dampak, tuliskan "Tidak ada dampak"." required>{{ old('impact', $featureRequest->impact) }}</textarea>
               @error('impact')
+                <div class="error">{{ $message }}</div>
+              @enderror
+            </div>
+          </div>
+
+          {{-- Baris 7: Lampiran (full width) --}}
+          <div class="col-12">
+            <div class="form-group">
+              <label for="attachment">Lampiran</label>
+              @if($featureRequest->attachment_filename)
+                <div style="margin-bottom: 6px; font-size: 13px; color: var(--muted);">
+                  File saat ini: <strong>{{ $featureRequest->attachment_filename }}</strong>
+                </div>
+              @endif
+              <input id="attachment" name="attachment" type="file" class="w-100" accept=".pdf,.jpg,.jpeg,.png" />
+              <small style="color: var(--muted); font-size: 12px;">Format: PDF, JPG, JPEG, PNG. Maksimal 3 MB. Kosongkan jika tidak ingin mengubah lampiran.</small>
+              @error('attachment')
                 <div class="error">{{ $message }}</div>
               @enderror
             </div>

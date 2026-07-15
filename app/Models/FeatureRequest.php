@@ -13,7 +13,7 @@ class FeatureRequest extends Model
 
     protected $fillable = [
         'application_id','title','slug','description','pemohon_perubahan',
-        'as_is','to_be','impact','type','priority','status',
+        'as_is','to_be','impact','attachment_filename','type','priority','status',
         'pic','rollback_plan','estimated_finish_at',
 
         'requested_by','assigned_to','metadata','votes_count','request_number',
@@ -85,5 +85,20 @@ class FeatureRequest extends Model
     public function assignee()
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function components()
+    {
+        return $this->hasMany(FeatureRequestComponent::class);
+    }
+
+    public function technicalComponents()
+    {
+        return $this->belongsToMany(\App\Models\TechnicalComponent::class, 'feature_request_components', 'feature_request_id', 'technical_component_id');
+    }
+
+    public function affectedApplications()
+    {
+        return $this->belongsToMany(Application::class, 'feature_request_application')->withTimestamps();
     }
 }

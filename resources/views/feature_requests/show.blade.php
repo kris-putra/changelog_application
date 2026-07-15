@@ -88,11 +88,23 @@
 
       {{-- Long text: Dampak Perubahan --}}
       @if($requestItem->impact)
-      <div class="mb-0">
+      <div class="mb-3">
         <small class="text-muted d-block mb-1">Dampak Perubahan</small>
         <div class="border rounded-3 p-3 bg-light" style="white-space: pre-wrap;">{{ $requestItem->impact }}</div>
       </div>
       @endif
+
+      {{-- Attachment --}}
+      <div class="mb-0">
+        <small class="text-muted d-block mb-1">Lampiran</small>
+        @if($requestItem->attachment_filename)
+          <a href="{{ route('feature-requests.attachment', $requestItem) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-paperclip me-1"></i>Buka Lampiran
+          </a>
+        @else
+          <span class="text-muted">Tidak ada lampiran</span>
+        @endif
+      </div>
     </div>
   </div>
 
@@ -137,10 +149,13 @@
   {{-- ======================================== --}}
   @if($requestItem->status === 'Completed')
   <div class="card border-0 shadow-sm rounded-4 mb-4" style="border-left: 4px solid #fd7e14 !important;">
-    <div class="card-header bg-light border-0 rounded-top-4 py-3">
+    <div class="card-header bg-light border-0 rounded-top-4 py-3 d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-bold" style="color: #e65100;">
         <i class="bi bi-check-circle me-2"></i>Data Penyelesaian
       </h5>
+      <button type="button" class="btn btn-sm btn-outline-primary" onclick="openEditCompleteModal({{ $requestItem->id }})">
+        <i class="bi bi-pencil me-1"></i>Edit
+      </button>
     </div>
     <div class="card-body px-4 py-4">
       {{-- Row: Tanggal Selesai --}}
@@ -151,6 +166,30 @@
         </div>
       </div>
 
+      {{-- Komponen yang Diubah --}}
+      @if($requestItem->technicalComponents && $requestItem->technicalComponents->count() > 0)
+      <div class="mb-3">
+        <small class="text-muted d-block mb-2">Komponen yang Diubah</small>
+        <div class="d-flex flex-wrap gap-2">
+          @foreach($requestItem->technicalComponents as $component)
+            <span class="badge bg-primary rounded-pill">{{ $component->name }}</span>
+          @endforeach
+        </div>
+      </div>
+      @endif
+
+      {{-- Aplikasi Terdampak --}}
+      @if($requestItem->affectedApplications && $requestItem->affectedApplications->count() > 0)
+      <div class="mb-3">
+        <small class="text-muted d-block mb-2">Aplikasi Terdampak</small>
+        <div class="d-flex flex-wrap gap-2">
+          @foreach($requestItem->affectedApplications as $app)
+            <span class="badge bg-info text-dark rounded-pill">{{ $app->name }}</span>
+          @endforeach
+        </div>
+      </div>
+      @endif
+
       {{-- Long text: Lesson Learned --}}
       <div class="mb-0">
         <small class="text-muted d-block mb-1">Lesson Learned</small>
@@ -159,4 +198,330 @@
     </div>
   </div>
   @endif
+
+  {{-- Complete Modal (shared for edit) --}}
+  <style>
+    #completeModal .modal-dialog { max-width: 900px; width: 100%; }
+    @media (min-width: 992px) {
+      #completeModal .col-components { flex: 0 0 40%; max-width: 40%; }
+      #completeModal .col-apps { flex: 0 0 60%; max-width: 60%; }
+    }
+    @media (min-width: 576px) and (max-width: 991.98px) {
+      #completeModal .modal-dialog { max-width: 90vw; }
+      #completeModal .col-components, #completeModal .col-apps { flex: 0 0 50%; max-width: 50%; }
+    }
+    @media (max-width: 575.98px) {
+      #completeModal .modal-dialog { max-width: calc(100vw - 1rem); margin: 0.5rem auto; }
+      #completeModal .col-components, #completeModal .col-apps { flex: 0 0 100%; max-width: 100%; }
+    }
+    #completeModal .component-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+    @media (max-width: 575.98px) { #completeModal .component-grid { grid-template-columns: 1fr; } }
+    #completeModal .app-search-container { position: relative; }
+    #completeModal .app-search-results {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 1050;
+      max-height: 200px; overflow-y: auto; background: #fff;
+      border: 1px solid #dee2e6; border-top: none;
+      border-radius: 0 0 0.375rem 0.375rem; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: none;
+    }
+    #completeModal .app-search-results .dropdown-item { padding: 8px 12px; cursor: pointer; font-size: 0.875rem; }
+    #completeModal .app-search-results .dropdown-item:hover { background-color: #f8f9fa; }
+    #completeModal .selected-apps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    #completeModal .selected-apps .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; padding: 5px 10px; }
+    #completeModal .selected-apps .badge .btn-close { font-size: 0.55rem; padding: 0; margin-left: 2px; filter: invert(1); }
+    #completeModal .component-error { color: #dc3545; font-size: 0.8rem; display: none; margin-top: 4px; }
+  </style>
+  <div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form id="completeForm" method="POST" action="">
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title" id="completeModalLabel">Edit Data Penyelesaian</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row mb-3">
+              <div class="col-12 col-md-6 col-components">
+                <label class="form-label fw-semibold">Komponen yang Diubah <span class="text-danger">*</span></label>
+                <div class="component-grid" id="componentsGrid">
+                  <div class="text-muted small text-center py-2">Memuat komponen...</div>
+                </div>
+                <div class="component-error" id="componentError">Pilih minimal satu komponen.</div>
+              </div>
+              <div class="col-12 col-md-6 col-apps">
+                <label class="form-label fw-semibold">Aplikasi Terdampak</label>
+                <div id="noApplicationsMsg" class="text-muted small mb-2" style="display: none;">Tidak ada aplikasi yang tersedia.</div>
+                <div class="app-search-container" id="appSearchContainer">
+                  <input type="text" class="form-control" id="appSearchInput"
+                         placeholder="Ketik minimal 2 karakter untuk mencari..." autocomplete="off">
+                  <div class="app-search-results" id="appSearchResults"></div>
+                </div>
+                <div class="selected-apps" id="selectedApps"></div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="complete-lesson" class="form-label fw-semibold">Lesson Learned <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="complete-lesson" name="lesson_learned" rows="5" placeholder="Tuliskan pembelajaran, kendala, atau rekomendasi setelah perubahan selesai." required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-end">
+            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success px-4" id="confirmCompleteBtn">Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var completeModal = null;
+    var selectedAppIds = [];
+    var technicalComponentsLoaded = false;
+
+    function loadTechnicalComponents(callback) {
+      if (technicalComponentsLoaded) { if (callback) callback(); return; }
+      fetch('/api/technical-components')
+        .then(function (res) { return res.json(); })
+        .then(function (components) {
+          var grid = document.getElementById('componentsGrid');
+          grid.innerHTML = '';
+          components.forEach(function (comp) {
+            var div = document.createElement('div');
+            div.className = 'form-check';
+            var slug = comp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            div.innerHTML =
+              '<input class="form-check-input component-checkbox" type="checkbox" name="technical_component_ids[]" value="' + comp.id + '" id="comp-' + slug + '">' +
+              '<label class="form-check-label" for="comp-' + slug + '">' + comp.name + '</label>';
+            grid.appendChild(div);
+          });
+          technicalComponentsLoaded = true;
+          if (callback) callback();
+        })
+        .catch(function () {
+          document.getElementById('componentsGrid').innerHTML = '<div class="text-danger small">Gagal memuat komponen.</div>';
+        });
+    }
+
+    function checkApplicationsExist() {
+      fetch('/api/applications/search?q=')
+        .then(function (res) { return res.json(); })
+        .then(function (apps) {
+          var noMsg = document.getElementById('noApplicationsMsg');
+          var container = document.getElementById('appSearchContainer');
+          if (apps.length === 0) {
+            noMsg.style.display = 'block';
+            container.style.display = 'none';
+          } else {
+            noMsg.style.display = 'none';
+            container.style.display = 'block';
+          }
+        });
+    }
+
+    function openEditCompleteModal(id) {
+      var form = document.getElementById('completeForm');
+      form.action = '/feature-requests/' + id + '/update-completed';
+
+      var methodInput = form.querySelector('input[name="_method"]');
+      if (!methodInput) {
+        methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        form.appendChild(methodInput);
+      }
+      methodInput.value = 'PUT';
+
+      selectedAppIds = [];
+      renderSelectedApps();
+      document.getElementById('componentError').style.display = 'none';
+      document.getElementById('appSearchResults').style.display = 'none';
+      document.getElementById('complete-lesson').value = '';
+
+      fetch('/api/feature-requests/' + id + '/completed-data')
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          document.getElementById('complete-lesson').value = data.lesson_learned || '';
+
+          technicalComponentsLoaded = false;
+          document.getElementById('componentsGrid').innerHTML = '<div class="text-muted small text-center py-2">Memuat komponen...</div>';
+          loadTechnicalComponents(function () {
+            var compIds = data.technical_component_ids || [];
+            compIds.forEach(function (cid) {
+              var cb = document.querySelector('#componentsGrid input[value="' + cid + '"]');
+              if (cb) cb.checked = true;
+            });
+          });
+
+          selectedAppIds = [];
+          if (data.affected_application_names) {
+            Object.keys(data.affected_application_names).forEach(function (appId) {
+              selectedAppIds.push({ id: parseInt(appId), name: data.affected_application_names[appId] });
+            });
+            renderSelectedApps();
+          }
+          checkApplicationsExist();
+        });
+
+      if (!completeModal) {
+        completeModal = new bootstrap.Modal(document.getElementById('completeModal'));
+      }
+      completeModal.show();
+    }
+
+    // Application search with debounce
+    document.addEventListener('DOMContentLoaded', function () {
+      var searchInput = document.getElementById('appSearchInput');
+      var searchResults = document.getElementById('appSearchResults');
+      var searchTimeout = null;
+
+      searchInput.addEventListener('input', function () {
+        var query = this.value.trim();
+        clearTimeout(searchTimeout);
+        if (query.length < 2) { searchResults.style.display = 'none'; return; }
+        searchTimeout = setTimeout(function () {
+          fetch('/api/applications/search?q=' + encodeURIComponent(query))
+            .then(function (res) { return res.json(); })
+            .then(function (apps) {
+              var filtered = apps
+                .filter(function (app) { return !selectedAppIds.some(function (a) { return a.id === app.id; }); })
+                .sort(function (a, b) { return a.name.localeCompare(b.name); });
+              if (filtered.length === 0) {
+                searchResults.innerHTML = '<div class="dropdown-item text-muted">Tidak ditemukan</div>';
+              } else {
+                searchResults.innerHTML = filtered.map(function (app) {
+                  return '<div class="dropdown-item" data-id="' + app.id + '" data-name="' + app.name.replace(/"/g, '"') + '">' + app.name + '</div>';
+                }).join('');
+              }
+              searchResults.style.display = 'block';
+            })
+            .catch(function () { searchResults.style.display = 'none'; });
+        }, 300);
+      });
+
+      searchResults.addEventListener('click', function (e) {
+        var item = e.target.closest('.dropdown-item');
+        if (!item || !item.dataset.id) return;
+        var id = parseInt(item.dataset.id);
+        var name = item.dataset.name;
+        var alreadySelected = selectedAppIds.some(function (a) { return a.id === id; });
+        if (!alreadySelected) {
+          selectedAppIds.push({ id: id, name: name });
+          selectedAppIds.sort(function (a, b) { return a.name.localeCompare(b.name); });
+          renderSelectedApps();
+        }
+        searchInput.value = '';
+        searchResults.style.display = 'none';
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#appSearchInput') && !e.target.closest('#appSearchResults')) {
+          searchResults.style.display = 'none';
+        }
+      });
+    });
+
+    function renderSelectedApps() {
+      var container = document.getElementById('selectedApps');
+      container.innerHTML = '';
+      selectedAppIds.forEach(function (app, index) {
+        var badge = document.createElement('span');
+        badge.className = 'badge bg-primary';
+        var nameSpan = document.createElement('span');
+        nameSpan.textContent = app.name;
+        badge.appendChild(nameSpan);
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn-close btn-close-white';
+        closeBtn.setAttribute('aria-label', 'Remove');
+        closeBtn.addEventListener('click', function () {
+          selectedAppIds.splice(index, 1);
+          renderSelectedApps();
+        });
+        badge.appendChild(closeBtn);
+        container.appendChild(badge);
+      });
+    }
+
+    // Form submission
+    document.addEventListener('DOMContentLoaded', function () {
+      var completeForm = document.getElementById('completeForm');
+      var completeBtn = document.getElementById('confirmCompleteBtn');
+
+      completeForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var checkedComponents = completeForm.querySelectorAll('.component-checkbox:checked');
+        if (checkedComponents.length === 0) {
+          document.getElementById('componentError').style.display = 'block';
+          return;
+        }
+        document.getElementById('componentError').style.display = 'none';
+
+        var lessonField = document.getElementById('complete-lesson');
+        if (!lessonField.value.trim()) {
+          lessonField.setCustomValidity('Lesson Learned wajib diisi.');
+          completeForm.reportValidity();
+          lessonField.setCustomValidity('');
+          return;
+        }
+
+        completeBtn.disabled = true;
+        completeBtn.textContent = 'Menyimpan...';
+
+        var formData = new FormData(completeForm);
+        selectedAppIds.forEach(function (app) {
+          formData.append('affected_application_ids[]', app.id);
+        });
+
+        fetch(completeForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        })
+        .then(function (response) {
+          if (response.ok) {
+            return response.json();
+          }
+          return response.json().then(function (err) {
+            var msg = 'Terjadi kesalahan validasi.';
+            if (err.errors) {
+              msg = Object.values(err.errors).map(function (e) { return e[0]; }).join('\n');
+            }
+            throw new Error(msg);
+          });
+        })
+        .then(function (data) {
+          if (data.success) {
+            completeModal.hide();
+            window.location.reload();
+          } else {
+            alert(data.message || 'Terjadi kesalahan.');
+            resetBtn();
+          }
+        })
+        .catch(function (err) {
+          alert(err.message || 'Terjadi kesalahan jaringan.');
+          resetBtn();
+        });
+
+        function resetBtn() {
+          completeBtn.disabled = false;
+          completeBtn.textContent = 'Simpan Perubahan';
+        }
+      });
+
+      document.getElementById('completeModal').addEventListener('hidden.bs.modal', function () {
+        completeForm.reset();
+        selectedAppIds = [];
+        renderSelectedApps();
+        document.getElementById('componentError').style.display = 'none';
+        completeBtn.disabled = false;
+        completeBtn.textContent = 'Simpan Perubahan';
+      });
+    });
+  </script>
 @endsection

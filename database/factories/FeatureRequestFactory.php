@@ -16,7 +16,7 @@ class FeatureRequestFactory extends Factory
             'description' => $this->faker->paragraphs(3, true),
             'type' => $this->faker->randomElement(['feature','change','bug']),
             'priority' => $this->faker->randomElement(['low','medium','high','urgent']),
-            'status' => 'pending',
+            'status' => 'Open',
             'requested_by' => 1,
             'assigned_to' => null,
             'metadata' => null,

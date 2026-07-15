@@ -17,6 +17,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/feature-requests/{featureRequest}/cancel', [FeatureRequestController::class, 'cancel'])->name('feature-requests.cancel');
     Route::post('/feature-requests/{featureRequest}/complete', [FeatureRequestController::class, 'complete'])->name('feature-requests.complete');
     Route::post('/feature-requests/{featureRequest}/save-execution', [FeatureRequestController::class, 'saveExecution'])->name('feature-requests.save-execution');
+    Route::get('/feature-requests/{featureRequest}/attachment', [FeatureRequestController::class, 'openAttachment'])->name('feature-requests.attachment');
+    Route::get('/api/applications/search', [FeatureRequestController::class, 'searchApplications'])->name('api.applications.search');
+    Route::get('/api/technical-components', [FeatureRequestController::class, 'getTechnicalComponents'])->name('api.technicalComponents');
+    Route::get('/api/feature-requests/{featureRequest}/completed-data', [FeatureRequestController::class, 'getCompletedData'])->name('api.completedData');
+    Route::put('/feature-requests/{featureRequest}/update-completed', [FeatureRequestController::class, 'updateCompleted'])->name('feature-requests.updateCompleted');
     Route::get('/add-application', [App\Http\Controllers\ApplicationController::class, 'create'])->name('applications.create');
     Route::post('/add-application', [App\Http\Controllers\ApplicationController::class, 'store'])->name('applications.store');
     Route::get('/applications/{application}/edit', [App\Http\Controllers\ApplicationController::class, 'edit'])->name('applications.edit');

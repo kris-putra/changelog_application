@@ -392,6 +392,13 @@
                                 onclick="openCompleteModal({{ $r->id }})">
                           <i class="bi bi-check-circle"></i>
                         </button>
+                      @elseif($r->status === 'Completed')
+                        {{-- Edit Completed Data --}}
+                        <button type="button" class="btn btn-link p-0 text-primary border-0"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Data Penyelesaian"
+                                onclick="openEditCompleteModal({{ $r->id }})">
+                          <i class="bi bi-pencil-square"></i>
+                        </button>
                       @endif
                     </div>
                   </td>
@@ -530,18 +537,38 @@
   <style>
     /* Completed Modal – responsive width */
     #completeModal .modal-dialog {
-      max-width: 760px;
+      max-width: 900px;
       width: 100%;
     }
-    @media (max-width: 991.98px) {
+    @media (min-width: 992px) {
+      #completeModal .col-components {
+        flex: 0 0 40%;
+        max-width: 40%;
+      }
+      #completeModal .col-apps {
+        flex: 0 0 60%;
+        max-width: 60%;
+      }
+    }
+    @media (min-width: 576px) and (max-width: 991.98px) {
       #completeModal .modal-dialog {
         max-width: 90vw;
+      }
+      #completeModal .col-components,
+      #completeModal .col-apps {
+        flex: 0 0 50%;
+        max-width: 50%;
       }
     }
     @media (max-width: 575.98px) {
       #completeModal .modal-dialog {
         max-width: calc(100vw - 1rem);
         margin: 0.5rem auto;
+      }
+      #completeModal .col-components,
+      #completeModal .col-apps {
+        flex: 0 0 100%;
+        max-width: 100%;
       }
     }
     #completeModal .modal-header {
@@ -556,6 +583,69 @@
     #completeModal .modal-footer {
       padding: 16px 24px 20px 24px;
     }
+    /* Component checkboxes */
+    #completeModal .component-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 16px;
+    }
+    @media (max-width: 575.98px) {
+      #completeModal .component-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    /* Searchable multi-select */
+    #completeModal .app-search-container {
+      position: relative;
+    }
+    #completeModal .app-search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 1050;
+      max-height: 200px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-top: none;
+      border-radius: 0 0 0.375rem 0.375rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: none;
+    }
+    #completeModal .app-search-results .dropdown-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    #completeModal .app-search-results .dropdown-item:hover {
+      background-color: #f8f9fa;
+    }
+    #completeModal .selected-apps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    #completeModal .selected-apps .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      padding: 5px 10px;
+    }
+    #completeModal .selected-apps .badge .btn-close {
+      font-size: 0.55rem;
+      padding: 0;
+      margin-left: 2px;
+      filter: invert(1);
+    }
+    #completeModal .component-error {
+      color: #dc3545;
+      font-size: 0.8rem;
+      display: none;
+      margin-top: 4px;
+    }
   </style>
   <div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -567,6 +657,32 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
+            {{-- Two-column layout: Components + Affected Applications --}}
+            <div class="row mb-3">
+              {{-- Left Column: Komponen yang Diubah --}}
+              <div class="col-12 col-md-6 col-components">
+                <label class="form-label fw-semibold">Komponen yang Diubah <span class="text-danger">*</span></label>
+                <div class="component-grid" id="componentsGrid">
+                  <div class="text-muted small text-center py-2" id="componentsLoading">Memuat komponen...</div>
+                </div>
+                <div class="component-error" id="componentError">Pilih minimal satu komponen.</div>
+              </div>
+
+              {{-- Right Column: Aplikasi Terdampak --}}
+              <div class="col-12 col-md-6 col-apps">
+                <label class="form-label fw-semibold">Aplikasi Terdampak</label>
+                <div id="noApplicationsMsg" class="text-muted small mb-2" style="display: none;">Tidak ada aplikasi yang tersedia.</div>
+                <div class="app-search-container" id="appSearchContainer">
+                  <input type="text" class="form-control" id="appSearchInput"
+                         placeholder="Ketik minimal 2 karakter untuk mencari..."
+                         autocomplete="off">
+                  <div class="app-search-results" id="appSearchResults"></div>
+                </div>
+                <div class="selected-apps" id="selectedApps"></div>
+              </div>
+            </div>
+
+            {{-- Lesson Learned (full width, below both columns) --}}
             <div class="mb-3">
               <label for="complete-lesson" class="form-label fw-semibold">Lesson Learned <span class="text-danger">*</span></label>
               <textarea class="form-control" id="complete-lesson" name="lesson_learned" rows="5" placeholder="Tuliskan pembelajaran, kendala, atau rekomendasi setelah perubahan selesai." required></textarea>
@@ -772,15 +888,233 @@
 
     // Complete Modal
     var completeModal = null;
+    var selectedAppIds = [];
+    var technicalComponentsLoaded = false;
+
+    function loadTechnicalComponents(callback) {
+      if (technicalComponentsLoaded) {
+        if (callback) callback();
+        return;
+      }
+      fetch('/api/technical-components')
+        .then(function (res) { return res.json(); })
+        .then(function (components) {
+          var grid = document.getElementById('componentsGrid');
+          grid.innerHTML = '';
+          components.forEach(function (comp) {
+            var div = document.createElement('div');
+            div.className = 'form-check';
+            var slug = comp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            div.innerHTML =
+              '<input class="form-check-input component-checkbox" type="checkbox" ' +
+              'name="technical_component_ids[]" value="' + comp.id + '" ' +
+              'id="comp-' + slug + '">' +
+              '<label class="form-check-label" for="comp-' + slug + '">' + comp.name + '</label>';
+            grid.appendChild(div);
+          });
+          technicalComponentsLoaded = true;
+          if (callback) callback();
+        })
+        .catch(function () {
+          document.getElementById('componentsGrid').innerHTML =
+            '<div class="text-danger small">Gagal memuat komponen.</div>';
+        });
+    }
+
+    function checkApplicationsExist() {
+      fetch('/api/applications/search?q=')
+        .then(function (res) { return res.json(); })
+        .then(function (apps) {
+          var noMsg = document.getElementById('noApplicationsMsg');
+          var container = document.getElementById('appSearchContainer');
+          if (apps.length === 0) {
+            noMsg.style.display = 'block';
+            container.style.display = 'none';
+          } else {
+            noMsg.style.display = 'none';
+            container.style.display = 'block';
+          }
+        });
+    }
 
     function openCompleteModal(id) {
       var form = document.getElementById('completeForm');
       form.action = '/feature-requests/' + id + '/complete';
       form.reset();
+      selectedAppIds = [];
+      renderSelectedApps();
+      document.getElementById('componentError').style.display = 'none';
+      document.getElementById('appSearchResults').style.display = 'none';
+      document.getElementById('completeModalLabel').textContent = 'Selesaikan Perubahan';
+      document.getElementById('confirmCompleteBtn').textContent = 'Selesai';
+
+      // Remove any _method input (in case it was set from edit mode)
+      var methodInput = form.querySelector('input[name="_method"]');
+      if (methodInput) methodInput.remove();
+
+      // Load dynamic components
+      technicalComponentsLoaded = false;
+      document.getElementById('componentsGrid').innerHTML = '<div class="text-muted small text-center py-2">Memuat komponen...</div>';
+      loadTechnicalComponents();
+
+      // Check applications exist
+      checkApplicationsExist();
+
       if (!completeModal) {
         completeModal = new bootstrap.Modal(document.getElementById('completeModal'));
       }
       completeModal.show();
+    }
+
+    function openEditCompleteModal(id) {
+      var form = document.getElementById('completeForm');
+      form.action = '/feature-requests/' + id + '/update-completed';
+
+      // Set PUT method
+      var methodInput = form.querySelector('input[name="_method"]');
+      if (!methodInput) {
+        methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        form.appendChild(methodInput);
+      }
+      methodInput.value = 'PUT';
+
+      document.getElementById('completeModalLabel').textContent = 'Edit Data Penyelesaian';
+      document.getElementById('confirmCompleteBtn').textContent = 'Simpan Perubahan';
+
+      selectedAppIds = [];
+      renderSelectedApps();
+      document.getElementById('componentError').style.display = 'none';
+      document.getElementById('appSearchResults').style.display = 'none';
+
+      // Load existing completed data
+      fetch('/api/feature-requests/' + id + '/completed-data')
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          document.getElementById('complete-lesson').value = data.lesson_learned || '';
+
+          // Load and check technical components
+          technicalComponentsLoaded = false;
+          document.getElementById('componentsGrid').innerHTML = '<div class="text-muted small text-center py-2">Memuat komponen...</div>';
+          loadTechnicalComponents(function () {
+            // Check the existing component IDs
+            var compIds = data.technical_component_ids || [];
+            compIds.forEach(function (cid) {
+              var cb = document.querySelector('#componentsGrid input[value="' + cid + '"]');
+              if (cb) cb.checked = true;
+            });
+          });
+
+          // Load existing affected applications
+          selectedAppIds = [];
+          if (data.affected_application_names) {
+            Object.keys(data.affected_application_names).forEach(function (id) {
+              selectedAppIds.push({
+                id: parseInt(id),
+                name: data.affected_application_names[id]
+              });
+            });
+            renderSelectedApps();
+          }
+
+          checkApplicationsExist();
+        });
+
+      if (!completeModal) {
+        completeModal = new bootstrap.Modal(document.getElementById('completeModal'));
+      }
+      completeModal.show();
+    }
+
+    // Searchable multi-select for applications (improved)
+    document.addEventListener('DOMContentLoaded', function () {
+      var searchInput = document.getElementById('appSearchInput');
+      var searchResults = document.getElementById('appSearchResults');
+      var searchTimeout = null;
+
+      searchInput.addEventListener('input', function () {
+        var query = this.value.trim();
+        clearTimeout(searchTimeout);
+        if (query.length < 2) {
+          searchResults.style.display = 'none';
+          return;
+        }
+        searchTimeout = setTimeout(function () {
+          fetch('/api/applications/search?q=' + encodeURIComponent(query))
+            .then(function (response) { return response.json(); })
+            .then(function (apps) {
+              // Filter out already selected and sort alphabetically
+              var filtered = apps
+                .filter(function (app) {
+                  return !selectedAppIds.some(function (a) {
+                    return (typeof a === 'object' ? a.id : a) === app.id;
+                  });
+                })
+                .sort(function (a, b) { return a.name.localeCompare(b.name); });
+
+              if (filtered.length === 0) {
+                searchResults.innerHTML = '<div class="dropdown-item text-muted">Tidak ditemukan</div>';
+              } else {
+                searchResults.innerHTML = filtered.map(function (app) {
+                  return '<div class="dropdown-item" data-id="' + app.id + '" data-name="' + app.name.replace(/"/g, '"') + '">' + app.name + '</div>';
+                }).join('');
+              }
+              searchResults.style.display = 'block';
+            })
+            .catch(function () {
+              searchResults.style.display = 'none';
+            });
+        }, 300);
+      });
+
+      searchResults.addEventListener('click', function (e) {
+        var item = e.target.closest('.dropdown-item');
+        if (!item || !item.dataset.id) return;
+        var id = parseInt(item.dataset.id);
+        var name = item.dataset.name;
+        // Prevent duplicates
+        var alreadySelected = selectedAppIds.some(function (a) {
+          return (typeof a === 'object' ? a.id : a) === id;
+        });
+        if (!alreadySelected) {
+          selectedAppIds.push({ id: id, name: name });
+          selectedAppIds.sort(function (a, b) { return a.name.localeCompare(b.name); });
+          renderSelectedApps();
+        }
+        // Clear search box after selection
+        searchInput.value = '';
+        searchResults.style.display = 'none';
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#appSearchInput') && !e.target.closest('#appSearchResults')) {
+          searchResults.style.display = 'none';
+        }
+      });
+    });
+
+    function renderSelectedApps() {
+      var container = document.getElementById('selectedApps');
+      container.innerHTML = '';
+      selectedAppIds.forEach(function (app, index) {
+        var badge = document.createElement('span');
+        badge.className = 'badge bg-primary';
+        var nameSpan = document.createElement('span');
+        nameSpan.textContent = app.name;
+        badge.appendChild(nameSpan);
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn-close btn-close-white';
+        closeBtn.setAttribute('aria-label', 'Remove');
+        closeBtn.addEventListener('click', function () {
+          selectedAppIds.splice(index, 1);
+          renderSelectedApps();
+        });
+        badge.appendChild(closeBtn);
+        container.appendChild(badge);
+      });
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -788,9 +1122,23 @@
       var completeBtn = document.getElementById('confirmCompleteBtn');
       var completeCancelBtn = completeForm.querySelector('[data-bs-dismiss="modal"]');
       var lessonField = document.getElementById('complete-lesson');
+      var componentError = document.getElementById('componentError');
+
+      // Override the click to store app names when fetching
+      var origFetch = window.fetch;
+      var searchInput = document.getElementById('appSearchInput');
+      var searchResults = document.getElementById('appSearchResults');
 
       completeBtn.addEventListener('click', function (e) {
         e.preventDefault();
+
+        // Validate at least one component selected
+        var checkedComponents = completeForm.querySelectorAll('.component-checkbox:checked');
+        if (checkedComponents.length === 0) {
+          componentError.style.display = 'block';
+          return;
+        }
+        componentError.style.display = 'none';
 
         // Validate lesson_learned
         if (!lessonField.value.trim()) {
@@ -806,6 +1154,11 @@
         if (completeCancelBtn) completeCancelBtn.disabled = true;
 
         var formData = new FormData(completeForm);
+
+        // Append affected applications
+        selectedAppIds.forEach(function (app) {
+          formData.append('affected_application_ids[]', app.id);
+        });
 
         fetch(completeForm.action, {
           method: 'POST',
@@ -860,7 +1213,16 @@
       var completeModalEl = document.getElementById('completeModal');
       completeModalEl.addEventListener('hidden.bs.modal', function () {
         completeForm.reset();
+        selectedAppIds = [];
+        renderSelectedApps();
+        componentError.style.display = 'none';
         resetCompleteBtn();
+        // Reset modal title and button text
+        document.getElementById('completeModalLabel').textContent = 'Selesaikan Perubahan';
+        document.getElementById('confirmCompleteBtn').textContent = 'Selesai';
+        // Remove _method input if present
+        var methodInput = completeForm.querySelector('input[name="_method"]');
+        if (methodInput) methodInput.remove();
       });
     });
   </script>

@@ -29,4 +29,9 @@ class Application extends Model
     {
         return $this->hasMany(FeatureRequest::class);
     }
+
+    public function affectedFeatureRequests()
+    {
+        return $this->belongsToMany(FeatureRequest::class, 'feature_request_application')->withTimestamps();
+    }
 }

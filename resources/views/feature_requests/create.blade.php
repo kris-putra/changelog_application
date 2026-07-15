@@ -119,7 +119,7 @@
 ~ refactor: ui</pre>
 
     <section class="card">
-      <form action="{{ route('feature-requests.store') }}" method="post" id="feature-form">
+      <form action="{{ route('feature-requests.store') }}" method="post" id="feature-form" enctype="multipart/form-data">
         @csrf
 
         @if ($errors->any())
@@ -236,8 +236,20 @@
           <div class="col-12">
             <div class="form-group">
               <label for="impact">Dampak Perubahan</label>
-              <textarea id="impact" name="impact" class="w-100" placeholder="Jelaskan dampak perubahan terhadap layanan, pengguna, atau sistem selama implementasi. Jika tidak ada dampak, tuliskan &quot;Tidak ada dampak&quot;." required>{{ old('impact') }}</textarea>
+              <textarea id="impact" name="impact" class="w-100" placeholder="Jelaskan dampak perubahan terhadap layanan, pengguna, atau sistem selama implementasi. Jika tidak ada dampak, tuliskan "Tidak ada dampak"." required>{{ old('impact') }}</textarea>
               @error('impact')
+                <div class="error">{{ $message }}</div>
+              @enderror
+            </div>
+          </div>
+
+          {{-- Baris 8: Lampiran (full width) --}}
+          <div class="col-12">
+            <div class="form-group">
+              <label for="attachment">Lampiran</label>
+              <input id="attachment" name="attachment" type="file" class="w-100" accept=".pdf,.jpg,.jpeg,.png" />
+              <small style="color: var(--muted); font-size: 12px;">Format: PDF, JPG, JPEG, PNG. Maksimal 3 MB.</small>
+              @error('attachment')
                 <div class="error">{{ $message }}</div>
               @enderror
             </div>

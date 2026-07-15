@@ -13,7 +13,7 @@ class StoreFeatureRequest extends FormRequest
 
     public function rules()
     {
-        return [
+        $rules = [
             'application_id' => 'required|exists:applications,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -25,5 +25,9 @@ class StoreFeatureRequest extends FormRequest
             'type' => 'required|in:feature,change,bug,incident',
             'priority' => 'required|in:low,medium,high,urgent',
         ];
+
+        $rules['attachment'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:3072';
+
+        return $rules;
     }
 }
