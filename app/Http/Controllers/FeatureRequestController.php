@@ -208,7 +208,7 @@ class FeatureRequestController extends Controller
             'lesson_learned' => 'required|string',
             'technical_component_ids' => 'required|array|min:1',
             'technical_component_ids.*' => 'exists:technical_components,id',
-            'affected_application_ids' => 'required|array|min:1',
+            'affected_application_ids' => 'nullable|array',
             'affected_application_ids.*' => 'exists:applications,id',
         ]);
 
@@ -225,7 +225,7 @@ class FeatureRequestController extends Controller
         $featureRequest->technicalComponents()->sync($validated['technical_component_ids']);
 
         // Sync affected applications (many-to-many)
-        $featureRequest->affectedApplications()->sync($validated['affected_application_ids']);
+        $featureRequest->affectedApplications()->sync($validated['affected_application_ids'] ?? []);
 
         if ($request->ajax()) {
             return response()->json([
@@ -265,7 +265,7 @@ class FeatureRequestController extends Controller
             'lesson_learned' => 'required|string',
             'technical_component_ids' => 'required|array|min:1',
             'technical_component_ids.*' => 'exists:technical_components,id',
-            'affected_application_ids' => 'required|array|min:1',
+            'affected_application_ids' => 'nullable|array',
             'affected_application_ids.*' => 'exists:applications,id',
         ]);
 
@@ -277,7 +277,7 @@ class FeatureRequestController extends Controller
         $featureRequest->technicalComponents()->sync($validated['technical_component_ids']);
 
         // Sync affected applications - sync() handles updates without duplicates
-        $featureRequest->affectedApplications()->sync($validated['affected_application_ids']);
+        $featureRequest->affectedApplications()->sync($validated['affected_application_ids'] ?? []);
 
         return response()->json([
             'success' => true,
