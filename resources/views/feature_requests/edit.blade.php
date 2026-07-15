@@ -242,7 +242,7 @@
           <div class="col-12">
             <div class="form-group">
               <label for="impact">Dampak Perubahan</label>
-              <textarea id="impact" name="impact" class="w-100" placeholder="Jelaskan dampak perubahan terhadap layanan, pengguna, atau sistem selama implementasi. Jika tidak ada dampak, tuliskan "Tidak ada dampak"." required>{{ old('impact', $featureRequest->impact) }}</textarea>
+              <textarea id="impact" name="impact" class="w-100" placeholder="Jelaskan dampak perubahan terhadap layanan, pengguna, atau sistem selama implementasi. Jika tidak ada dampak, tuliskan "Tidak ada dampak".">{{ old('impact', $featureRequest->impact) }}</textarea>
               @error('impact')
                 <div class="error">{{ $message }}</div>
               @enderror

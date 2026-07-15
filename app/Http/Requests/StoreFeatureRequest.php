@@ -20,7 +20,7 @@ class StoreFeatureRequest extends FormRequest
             'pemohon_perubahan' => 'nullable|string|max:255',
             'as_is' => 'nullable|string',
             'to_be' => 'nullable|string',
-            'impact' => 'required|string',
+            'impact' => 'nullable|string',
 
             'type' => 'required|in:feature,change,bug,incident',
             'priority' => 'required|in:low,medium,high,urgent',

@@ -87,12 +87,14 @@
       @endif
 
       {{-- Long text: Dampak Perubahan --}}
-      @if($requestItem->impact)
       <div class="mb-3">
         <small class="text-muted d-block mb-1">Dampak Perubahan</small>
-        <div class="border rounded-3 p-3 bg-light" style="white-space: pre-wrap;">{{ $requestItem->impact }}</div>
+        @if($requestItem->impact)
+          <div class="border rounded-3 p-3 bg-light" style="white-space: pre-wrap;">{{ $requestItem->impact }}</div>
+        @else
+          <div class="border rounded-3 p-3 bg-light text-muted" style="white-space: pre-wrap;">Tidak ada dampak perubahan yang dicatat.</div>
+        @endif
       </div>
-      @endif
 
       {{-- Attachment --}}
       <div class="mb-0">
