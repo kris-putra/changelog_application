@@ -243,8 +243,39 @@ class FeatureRequestController extends Controller
 
     public function getTechnicalComponents()
     {
-        $components = TechnicalComponent::orderBy('display_order')->get(['id', 'name']);
+        $components = TechnicalComponent::orderBy('name', 'asc')->get(['id', 'name']);
         return response()->json($components);
+    }
+
+    public function storeTechnicalComponent(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $name = trim($request->input('name'));
+
+        // Case-insensitive duplicate check
+        $existing = TechnicalComponent::whereRaw('LOWER(name) = ?', [strtolower($name)])->first();
+        if ($existing) {
+            return response()->json([
+                'success' => true,
+                'duplicate' => true,
+                'id' => $existing->id,
+                'name' => $existing->name,
+                'message' => 'Komponen "' . $existing->name . '" sudah ada. Otomatis dipilih.',
+            ]);
+        }
+
+        $component = TechnicalComponent::create(['name' => $name]);
+
+        return response()->json([
+            'success' => true,
+            'duplicate' => false,
+            'id' => $component->id,
+            'name' => $component->name,
+            'message' => 'Komponen berhasil ditambahkan.',
+        ]);
     }
 
     public function getCompletedData(FeatureRequest $featureRequest)

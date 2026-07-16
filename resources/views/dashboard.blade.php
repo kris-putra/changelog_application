@@ -533,118 +533,73 @@
     </div>
   </div>
 
-  {{-- Completed Modal --}}
   <style>
-    /* Completed Modal – responsive width */
-    #completeModal .modal-dialog {
-      max-width: 900px;
-      width: 100%;
-    }
-    @media (min-width: 992px) {
-      #completeModal .col-components {
-        flex: 0 0 40%;
-        max-width: 40%;
-      }
-      #completeModal .col-apps {
-        flex: 0 0 60%;
-        max-width: 60%;
-      }
-    }
-    @media (min-width: 576px) and (max-width: 991.98px) {
-      #completeModal .modal-dialog {
-        max-width: 90vw;
-      }
-      #completeModal .col-components,
-      #completeModal .col-apps {
-        flex: 0 0 50%;
-        max-width: 50%;
-      }
-    }
-    @media (max-width: 575.98px) {
-      #completeModal .modal-dialog {
-        max-width: calc(100vw - 1rem);
-        margin: 0.5rem auto;
-      }
-      #completeModal .col-components,
-      #completeModal .col-apps {
-        flex: 0 0 100%;
-        max-width: 100%;
-      }
-    }
-    #completeModal .modal-header {
-      padding: 24px 24px 16px 24px;
-    }
-    #completeModal .modal-body {
-      padding: 0 24px 24px 24px;
-    }
-    #completeModal .modal-body .mb-3:last-child {
-      margin-bottom: 0 !important;
-    }
-    #completeModal .modal-footer {
-      padding: 16px 24px 20px 24px;
-    }
-    /* Component checkboxes */
-    #completeModal .component-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px 16px;
-    }
-    @media (max-width: 575.98px) {
-      #completeModal .component-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    /* Searchable multi-select */
-    #completeModal .app-search-container {
-      position: relative;
-    }
-    #completeModal .app-search-results {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      z-index: 1050;
-      max-height: 200px;
-      overflow-y: auto;
-      background: #fff;
+    #completeModal .modal-dialog { max-width: 940px; width: 100%; }
+    #completeModal .modal-body { padding: 0 24px 24px 24px; }
+    #completeModal .modal-header { padding: 24px 24px 16px 24px; }
+    #completeModal .modal-footer { padding: 16px 24px 20px 24px; }
+
+    /* Twin column panel */
+    #completeModal .twin-column-panel {
       border: 1px solid #dee2e6;
-      border-top: none;
-      border-radius: 0 0 0.375rem 0.375rem;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      display: none;
+      border-radius: 0.375rem;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
-    #completeModal .app-search-results .dropdown-item {
-      padding: 8px 12px;
-      cursor: pointer;
+    #completeModal .twin-column-header {
+      padding: 10px 12px 8px 12px;
+      border-bottom: 1px solid #dee2e6;
+      background: #f8f9fa;
+      border-radius: 0.375rem 0.375rem 0 0;
+    }
+    #completeModal .twin-column-header .form-label {
+      margin-bottom: 0;
       font-size: 0.875rem;
     }
-    #completeModal .app-search-results .dropdown-item:hover {
-      background-color: #f8f9fa;
-    }
-    #completeModal .selected-apps {
+    #completeModal .twin-column-body {
+      flex: 1;
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
-    }
-    #completeModal .selected-apps .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.8rem;
-      padding: 5px 10px;
-    }
-    #completeModal .selected-apps .badge .btn-close {
-      font-size: 0.55rem;
+      flex-direction: column;
+      min-height: 0;
       padding: 0;
-      margin-left: 2px;
-      filter: invert(1);
     }
-    #completeModal .component-error {
-      color: #dc3545;
+
+    /* Scroll boxes – identical for both */
+    #completeModal .component-scroll-box,
+    #completeModal .app-scroll-box {
+      height: 220px;
+      overflow-y: auto;
+      border: none;
+      border-radius: 0;
+      padding: 8px 12px;
+      background: #fff;
+      flex: 1;
+      min-height: 0;
+    }
+    #completeModal .component-scroll-box .form-check,
+    #completeModal .app-scroll-box .form-check {
+      margin-bottom: 4px;
+    }
+
+    /* Bottom input area – identical for both */
+    #completeModal .twin-column-footer {
+      border-top: 1px solid #dee2e6;
+      padding: 10px 12px;
+      background: #f8f9fa;
+      border-radius: 0 0 0.375rem 0.375rem;
+    }
+    #completeModal .twin-column-footer .form-label {
       font-size: 0.8rem;
-      display: none;
-      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    #completeModal .component-error { color: #dc3545; font-size: 0.8rem; display: none; margin-top: 4px; }
+    #completeModal .add-component-feedback { display: none; margin-top: 4px; }
+
+    @media (max-width: 767.98px) {
+      #completeModal .modal-dialog { max-width: calc(100vw - 1rem); margin: 0.5rem auto; }
     }
   </style>
   <div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
@@ -657,35 +612,53 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            {{-- Two-column layout: Components + Affected Applications --}}
             <div class="row mb-3">
-              {{-- Left Column: Komponen yang Diubah --}}
-              <div class="col-12 col-md-6 col-components">
-                <label class="form-label fw-semibold">Komponen yang Diubah <span class="text-danger">*</span></label>
-                <div class="component-grid" id="componentsGrid">
-                  <div class="text-muted small text-center py-2" id="componentsLoading">Memuat komponen...</div>
+              {{-- Left column: Technical Components --}}
+              <div class="col-md-6">
+                <div class="twin-column-panel">
+                  <div class="twin-column-header">
+                    <label class="form-label fw-semibold">Komponen yang Diubah <span class="text-danger">*</span></label>
+                  </div>
+                  <div class="twin-column-body">
+                    <div class="component-scroll-box" id="componentsScrollBox">
+                      <div class="text-muted small text-center py-2">Memuat komponen...</div>
+                    </div>
+                  </div>
+                  <div class="twin-column-footer">
+                    <div class="component-error" id="componentError">Pilih minimal satu komponen.</div>
+                    <label class="form-label fw-semibold">Tambah Komponen Baru</label>
+                    <input type="text" class="form-control form-control-sm mb-2" id="newComponentInput" placeholder="Nama komponen baru...">
+                    <button class="btn btn-sm btn-primary w-100" type="button" id="addComponentBtn">Tambah Komponen</button>
+                    <div id="addComponentFeedback" class="add-component-feedback small"></div>
+                  </div>
                 </div>
-                <div class="component-error" id="componentError">Pilih minimal satu komponen.</div>
               </div>
 
-              {{-- Right Column: Aplikasi Terdampak --}}
-              <div class="col-12 col-md-6 col-apps">
-                <label class="form-label fw-semibold">Aplikasi Terdampak</label>
-                <div id="noApplicationsMsg" class="text-muted small mb-2" style="display: none;">Tidak ada aplikasi yang tersedia.</div>
-                <div class="app-search-container" id="appSearchContainer">
-                  <input type="text" class="form-control" id="appSearchInput"
-                         placeholder="Ketik minimal 2 karakter untuk mencari..."
-                         autocomplete="off">
-                  <div class="app-search-results" id="appSearchResults"></div>
+              {{-- Right column: Affected Applications --}}
+              <div class="col-md-6">
+                <div class="twin-column-panel">
+                  <div class="twin-column-header">
+                    <label class="form-label fw-semibold">Aplikasi Terdampak</label>
+                  </div>
+                  <div class="twin-column-body">
+                    <div id="noApplicationsMsg" class="text-muted small text-center py-2" style="display: none;">Tidak ada aplikasi yang tersedia.</div>
+                    <div id="appSearchContainer">
+                      <div class="app-scroll-box" id="appsScrollBox">
+                        <div class="text-muted small text-center py-2">Memuat aplikasi...</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="twin-column-footer">
+                    <label class="form-label fw-semibold">Cari Aplikasi</label>
+                    <input type="text" class="form-control form-control-sm" id="appFilterInput"
+                           placeholder="Ketik nama aplikasi..." autocomplete="off">
+                  </div>
                 </div>
-                <div class="selected-apps" id="selectedApps"></div>
               </div>
             </div>
-
-            {{-- Lesson Learned (full width, below both columns) --}}
-            <div class="mb-3">
+            <div class="mb-0">
               <label for="complete-lesson" class="form-label fw-semibold">Lesson Learned <span class="text-danger">*</span></label>
-              <textarea class="form-control" id="complete-lesson" name="lesson_learned" rows="5" placeholder="Tuliskan pembelajaran, kendala, atau rekomendasi setelah perubahan selesai." required></textarea>
+              <textarea class="form-control" id="complete-lesson" name="lesson_learned" rows="4" placeholder="Tuliskan pembelajaran, kendala, atau rekomendasi setelah perubahan selesai." required></textarea>
             </div>
           </div>
           <div class="modal-footer justify-content-end">
@@ -730,10 +703,16 @@
 
     // Start Progress Modal
     var startModal = null;
+    var featureRequestId = null;
 
     function openStartModal(id) {
+      if (id === null || id === undefined || !Number.isFinite(Number(id)) || Number(id) < 1 || !Number.isInteger(Number(id))) {
+        alert('ID permintaan tidak valid. Silakan muat ulang halaman.');
+        return;
+      }
+      featureRequestId = Number(id);
       var form = document.getElementById('startProgressForm');
-      form.action = '/feature-requests/' + id + '/save-execution';
+      form.action = '/feature-requests/' + featureRequestId + '/save-execution';
       form.reset();
       if (!startModal) {
         startModal = new bootstrap.Modal(document.getElementById('startProgressModal'));
@@ -888,77 +867,269 @@
 
     // Complete Modal
     var completeModal = null;
-    var selectedAppIds = [];
+    var allApplications = [];
     var technicalComponentsLoaded = false;
 
+    /* ========== Technical Components ========== */
+
     function loadTechnicalComponents(callback) {
-      if (technicalComponentsLoaded) {
-        if (callback) callback();
-        return;
-      }
+      if (technicalComponentsLoaded) { if (callback) callback(); return; }
       fetch('/api/technical-components')
         .then(function (res) { return res.json(); })
         .then(function (components) {
-          var grid = document.getElementById('componentsGrid');
-          grid.innerHTML = '';
-          components.forEach(function (comp) {
-            var div = document.createElement('div');
-            div.className = 'form-check';
-            var slug = comp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            div.innerHTML =
-              '<input class="form-check-input component-checkbox" type="checkbox" ' +
-              'name="technical_component_ids[]" value="' + comp.id + '" ' +
-              'id="comp-' + slug + '">' +
-              '<label class="form-check-label" for="comp-' + slug + '">' + comp.name + '</label>';
-            grid.appendChild(div);
-          });
+          renderComponentsList(components);
           technicalComponentsLoaded = true;
           if (callback) callback();
         })
         .catch(function () {
-          document.getElementById('componentsGrid').innerHTML =
-            '<div class="text-danger small">Gagal memuat komponen.</div>';
+          document.getElementById('componentsScrollBox').innerHTML = '<div class="text-danger small">Gagal memuat komponen.</div>';
         });
     }
 
-    function checkApplicationsExist() {
+    function renderComponentsList(components) {
+      var box = document.getElementById('componentsScrollBox');
+      box.innerHTML = '';
+      if (components.length === 0) {
+        box.innerHTML = '<div class="text-muted small text-center py-2">Belum ada komponen.</div>';
+        return;
+      }
+      components.forEach(function (comp) {
+        var div = document.createElement('div');
+        div.className = 'form-check';
+        var slug = comp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        div.innerHTML =
+          '<input class="form-check-input component-checkbox" type="checkbox" name="technical_component_ids[]" value="' + comp.id + '" id="comp-' + slug + '">' +
+          '<label class="form-check-label" for="comp-' + slug + '">' + escapeHtml(comp.name) + '</label>';
+        box.appendChild(div);
+      });
+    }
+
+    /* ========== Add New Component ========== */
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var addBtn = document.getElementById('addComponentBtn');
+      var addInput = document.getElementById('newComponentInput');
+      var feedback = document.getElementById('addComponentFeedback');
+
+      addBtn.addEventListener('click', function () { addNewComponent(); });
+      addInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); addNewComponent(); }
+      });
+
+      function addNewComponent() {
+        var name = addInput.value.trim();
+        if (!name) {
+          feedback.style.display = 'block';
+          feedback.className = 'add-component-feedback small text-danger';
+          feedback.textContent = 'Nama komponen tidak boleh kosong.';
+          return;
+        }
+
+        addBtn.disabled = true;
+        addBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>Menambahkan...';
+
+        // Resilient CSRF token: meta tag → hidden _token input → error
+        var csrfToken = '';
+        try {
+          var metaTag = document.querySelector('meta[name="csrf-token"]');
+          if (metaTag) {
+            csrfToken = metaTag.getAttribute('content');
+          }
+        } catch (e) { /* meta tag not found or error reading it */ }
+        if (!csrfToken) {
+          var tokenInput = document.querySelector('input[name="_token"]');
+          if (tokenInput) {
+            csrfToken = tokenInput.value;
+          }
+        }
+        if (!csrfToken) {
+          feedback.style.display = 'block';
+          feedback.className = 'add-component-feedback small text-danger';
+          feedback.textContent = 'Token CSRF tidak ditemukan. Muat ulang halaman.';
+          addBtn.disabled = false;
+          addBtn.textContent = 'Tambah Komponen';
+          return;
+        }
+
+        try {
+          fetch('/api/technical-components', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ name: name })
+          })
+          .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+          .then(function (result) {
+            if (result.ok && result.data.success) {
+              var comp = result.data;
+              var box = document.getElementById('componentsScrollBox');
+              var placeholder = box.querySelector('.text-muted.text-center');
+              if (placeholder) placeholder.remove();
+
+              if (comp.duplicate) {
+                // Duplicate: find the existing checkbox and check it
+                var existingCb = box.querySelector('input[value="' + comp.id + '"]');
+                if (existingCb) {
+                  existingCb.checked = true;
+                  // Flash the label briefly
+                  var parentDiv = existingCb.closest('.form-check');
+                  if (parentDiv) {
+                    parentDiv.style.background = '#d1e7dd';
+                    setTimeout(function () { parentDiv.style.background = ''; }, 1500);
+                  }
+                }
+                feedback.style.display = 'block';
+                feedback.className = 'add-component-feedback small text-info';
+                feedback.textContent = '"' + comp.name + '" sudah ada. Otomatis dipilih.';
+              } else {
+                // New component: append and check it
+                var div = document.createElement('div');
+                div.className = 'form-check';
+                var slug = comp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                div.innerHTML =
+                  '<input class="form-check-input component-checkbox" type="checkbox" name="technical_component_ids[]" value="' + comp.id + '" id="comp-' + slug + '" checked>' +
+                  '<label class="form-check-label" for="comp-' + slug + '">' + escapeHtml(comp.name) + '</label>';
+                box.appendChild(div);
+                sortComponentsList();
+
+                feedback.style.display = 'block';
+                feedback.className = 'add-component-feedback small text-success';
+                feedback.textContent = '"' + comp.name + '" berhasil ditambahkan.';
+              }
+
+              addInput.value = '';
+              setTimeout(function () { feedback.style.display = 'none'; }, 3000);
+              technicalComponentsLoaded = false;
+            } else {
+              feedback.style.display = 'block';
+              feedback.className = 'add-component-feedback small text-danger';
+              feedback.textContent = result.data.message || 'Gagal menambahkan komponen.';
+            }
+          })
+          .catch(function () {
+            feedback.style.display = 'block';
+            feedback.className = 'add-component-feedback small text-danger';
+            feedback.textContent = 'Terjadi kesalahan jaringan.';
+          })
+          .finally(function () {
+            addBtn.disabled = false;
+            addBtn.textContent = 'Tambah Komponen';
+          });
+        } catch (e) {
+          feedback.style.display = 'block';
+          feedback.className = 'add-component-feedback small text-danger';
+          feedback.textContent = 'Terjadi kesalahan: ' + e.message;
+          addBtn.disabled = false;
+          addBtn.textContent = 'Tambah Komponen';
+        }
+      }
+
+      function sortComponentsList() {
+        var box = document.getElementById('componentsScrollBox');
+        var checks = Array.from(box.querySelectorAll('.form-check'));
+        checks.sort(function (a, b) {
+          var nameA = a.querySelector('label').textContent.toLowerCase();
+          var nameB = b.querySelector('label').textContent.toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+        checks.forEach(function (el) { box.appendChild(el); });
+      }
+    });
+
+    /* ========== Affected Applications ========== */
+
+    function loadAllApplications(callback) {
       fetch('/api/applications/search?q=')
         .then(function (res) { return res.json(); })
         .then(function (apps) {
+          allApplications = apps.sort(function (a, b) { return a.name.localeCompare(b.name); });
+          renderApplicationsList(allApplications);
           var noMsg = document.getElementById('noApplicationsMsg');
           var container = document.getElementById('appSearchContainer');
-          if (apps.length === 0) {
+          if (allApplications.length === 0) {
             noMsg.style.display = 'block';
             container.style.display = 'none';
           } else {
             noMsg.style.display = 'none';
             container.style.display = 'block';
           }
+          if (callback) callback();
+        })
+        .catch(function () {
+          document.getElementById('appsScrollBox').innerHTML = '<div class="text-danger small">Gagal memuat aplikasi.</div>';
         });
     }
 
-    function openCompleteModal(id) {
-      var form = document.getElementById('completeForm');
-      form.action = '/feature-requests/' + id + '/complete';
-      form.reset();
-      selectedAppIds = [];
-      renderSelectedApps();
-      document.getElementById('componentError').style.display = 'none';
-      document.getElementById('appSearchResults').style.display = 'none';
-      document.getElementById('completeModalLabel').textContent = 'Selesaikan Perubahan';
-      document.getElementById('confirmCompleteBtn').textContent = 'Selesai';
+    function renderApplicationsList(apps) {
+      var box = document.getElementById('appsScrollBox');
+      box.innerHTML = '';
+      if (apps.length === 0) {
+        box.innerHTML = '<div class="text-muted small text-center py-2">Tidak ditemukan.</div>';
+        return;
+      }
+      apps.forEach(function (app) {
+        var div = document.createElement('div');
+        div.className = 'form-check';
+        div.setAttribute('data-app-name', app.name.toLowerCase());
+        var slug = app.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        div.innerHTML =
+          '<input class="form-check-input app-checkbox" type="checkbox" value="' + app.id + '" id="app-' + slug + '" data-app-name="' + escapeHtml(app.name) + '">' +
+          '<label class="form-check-label" for="app-' + slug + '">' + escapeHtml(app.name) + '</label>';
+        box.appendChild(div);
+      });
+    }
 
-      // Remove any _method input (in case it was set from edit mode)
+    // App filter
+    document.addEventListener('DOMContentLoaded', function () {
+      var filterInput = document.getElementById('appFilterInput');
+      filterInput.addEventListener('input', function () {
+        var query = this.value.trim().toLowerCase();
+        var checks = document.querySelectorAll('#appsScrollBox .form-check');
+        checks.forEach(function (div) {
+          var appName = div.getAttribute('data-app-name') || '';
+          if (query === '' || appName.indexOf(query) !== -1) {
+            div.style.display = '';
+          } else {
+            div.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    /* ========== Open Complete Modal ========== */
+
+    function openCompleteModal(id) {
+      if (id === null || id === undefined || !Number.isFinite(Number(id)) || Number(id) < 1 || !Number.isInteger(Number(id))) {
+        alert('ID permintaan tidak valid. Silakan muat ulang halaman.');
+        return;
+      }
+      featureRequestId = Number(id);
+      var form = document.getElementById('completeForm');
+      form.action = '/feature-requests/' + featureRequestId + '/complete';
+      form.reset();
+      document.getElementById('componentError').style.display = 'none';
+      document.getElementById('appFilterInput').value = '';
+
+      // Remove any _method input
       var methodInput = form.querySelector('input[name="_method"]');
       if (methodInput) methodInput.remove();
 
-      // Load dynamic components
+      // Reset add component feedback
+      var feedback = document.getElementById('addComponentFeedback');
+      feedback.style.display = 'none';
+      document.getElementById('newComponentInput').value = '';
+
+      // Load components
       technicalComponentsLoaded = false;
-      document.getElementById('componentsGrid').innerHTML = '<div class="text-muted small text-center py-2">Memuat komponen...</div>';
+      document.getElementById('componentsScrollBox').innerHTML = '<div class="text-muted small text-center py-2">Memuat komponen...</div>';
       loadTechnicalComponents();
 
-      // Check applications exist
-      checkApplicationsExist();
+      // Load applications
+      document.getElementById('appsScrollBox').innerHTML = '<div class="text-muted small text-center py-2">Memuat aplikasi...</div>';
+      loadAllApplications();
 
       if (!completeModal) {
         completeModal = new bootstrap.Modal(document.getElementById('completeModal'));
@@ -966,11 +1137,17 @@
       completeModal.show();
     }
 
-    function openEditCompleteModal(id) {
-      var form = document.getElementById('completeForm');
-      form.action = '/feature-requests/' + id + '/update-completed';
+    /* ========== Open Edit Complete Modal ========== */
 
-      // Set PUT method
+    function openEditCompleteModal(id) {
+      if (id === null || id === undefined || !Number.isFinite(Number(id)) || Number(id) < 1 || !Number.isInteger(Number(id))) {
+        alert('ID permintaan tidak valid. Silakan muat ulang halaman.');
+        return;
+      }
+      featureRequestId = Number(id);
+      var form = document.getElementById('completeForm');
+      form.action = '/feature-requests/' + featureRequestId + '/update-completed';
+
       var methodInput = form.querySelector('input[name="_method"]');
       if (!methodInput) {
         methodInput = document.createElement('input');
@@ -980,45 +1157,40 @@
       }
       methodInput.value = 'PUT';
 
-      document.getElementById('completeModalLabel').textContent = 'Edit Data Penyelesaian';
-      document.getElementById('confirmCompleteBtn').textContent = 'Simpan Perubahan';
-
-      selectedAppIds = [];
-      renderSelectedApps();
       document.getElementById('componentError').style.display = 'none';
-      document.getElementById('appSearchResults').style.display = 'none';
+      document.getElementById('appFilterInput').value = '';
+      document.getElementById('complete-lesson').value = '';
 
-      // Load existing completed data
+      // Reset add component feedback
+      var feedback = document.getElementById('addComponentFeedback');
+      feedback.style.display = 'none';
+      document.getElementById('newComponentInput').value = '';
+
       fetch('/api/feature-requests/' + id + '/completed-data')
         .then(function (res) { return res.json(); })
         .then(function (data) {
           document.getElementById('complete-lesson').value = data.lesson_learned || '';
 
-          // Load and check technical components
+          // Load components
           technicalComponentsLoaded = false;
-          document.getElementById('componentsGrid').innerHTML = '<div class="text-muted small text-center py-2">Memuat komponen...</div>';
+          document.getElementById('componentsScrollBox').innerHTML = '<div class="text-muted small text-center py-2">Memuat komponen...</div>';
           loadTechnicalComponents(function () {
-            // Check the existing component IDs
             var compIds = data.technical_component_ids || [];
             compIds.forEach(function (cid) {
-              var cb = document.querySelector('#componentsGrid input[value="' + cid + '"]');
+              var cb = document.querySelector('#componentsScrollBox input[value="' + cid + '"]');
               if (cb) cb.checked = true;
             });
           });
 
-          // Load existing affected applications
-          selectedAppIds = [];
-          if (data.affected_application_names) {
-            Object.keys(data.affected_application_names).forEach(function (id) {
-              selectedAppIds.push({
-                id: parseInt(id),
-                name: data.affected_application_names[id]
-              });
+          // Load applications
+          document.getElementById('appsScrollBox').innerHTML = '<div class="text-muted small text-center py-2">Memuat aplikasi...</div>';
+          loadAllApplications(function () {
+            var appIds = data.affected_application_ids || [];
+            appIds.forEach(function (aid) {
+              var cb = document.querySelector('#appsScrollBox input[value="' + aid + '"]');
+              if (cb) cb.checked = true;
             });
-            renderSelectedApps();
-          }
-
-          checkApplicationsExist();
+          });
         });
 
       if (!completeModal) {
@@ -1027,120 +1199,24 @@
       completeModal.show();
     }
 
-    // Searchable multi-select for applications (improved)
-    document.addEventListener('DOMContentLoaded', function () {
-      var searchInput = document.getElementById('appSearchInput');
-      var searchResults = document.getElementById('appSearchResults');
-      var searchTimeout = null;
-
-      searchInput.addEventListener('input', function () {
-        var query = this.value.trim();
-        clearTimeout(searchTimeout);
-        if (query.length < 2) {
-          searchResults.style.display = 'none';
-          return;
-        }
-        searchTimeout = setTimeout(function () {
-          fetch('/api/applications/search?q=' + encodeURIComponent(query))
-            .then(function (response) { return response.json(); })
-            .then(function (apps) {
-              // Filter out already selected and sort alphabetically
-              var filtered = apps
-                .filter(function (app) {
-                  return !selectedAppIds.some(function (a) {
-                    return (typeof a === 'object' ? a.id : a) === app.id;
-                  });
-                })
-                .sort(function (a, b) { return a.name.localeCompare(b.name); });
-
-              if (filtered.length === 0) {
-                searchResults.innerHTML = '<div class="dropdown-item text-muted">Tidak ditemukan</div>';
-              } else {
-                searchResults.innerHTML = filtered.map(function (app) {
-                  return '<div class="dropdown-item" data-id="' + app.id + '" data-name="' + app.name.replace(/"/g, '"') + '">' + app.name + '</div>';
-                }).join('');
-              }
-              searchResults.style.display = 'block';
-            })
-            .catch(function () {
-              searchResults.style.display = 'none';
-            });
-        }, 300);
-      });
-
-      searchResults.addEventListener('click', function (e) {
-        var item = e.target.closest('.dropdown-item');
-        if (!item || !item.dataset.id) return;
-        var id = parseInt(item.dataset.id);
-        var name = item.dataset.name;
-        // Prevent duplicates
-        var alreadySelected = selectedAppIds.some(function (a) {
-          return (typeof a === 'object' ? a.id : a) === id;
-        });
-        if (!alreadySelected) {
-          selectedAppIds.push({ id: id, name: name });
-          selectedAppIds.sort(function (a, b) { return a.name.localeCompare(b.name); });
-          renderSelectedApps();
-        }
-        // Clear search box after selection
-        searchInput.value = '';
-        searchResults.style.display = 'none';
-      });
-
-      // Close dropdown when clicking outside
-      document.addEventListener('click', function (e) {
-        if (!e.target.closest('#appSearchInput') && !e.target.closest('#appSearchResults')) {
-          searchResults.style.display = 'none';
-        }
-      });
-    });
-
-    function renderSelectedApps() {
-      var container = document.getElementById('selectedApps');
-      container.innerHTML = '';
-      selectedAppIds.forEach(function (app, index) {
-        var badge = document.createElement('span');
-        badge.className = 'badge bg-primary';
-        var nameSpan = document.createElement('span');
-        nameSpan.textContent = app.name;
-        badge.appendChild(nameSpan);
-        var closeBtn = document.createElement('button');
-        closeBtn.type = 'button';
-        closeBtn.className = 'btn-close btn-close-white';
-        closeBtn.setAttribute('aria-label', 'Remove');
-        closeBtn.addEventListener('click', function () {
-          selectedAppIds.splice(index, 1);
-          renderSelectedApps();
-        });
-        badge.appendChild(closeBtn);
-        container.appendChild(badge);
-      });
-    }
+    /* ========== Form Submission ========== */
 
     document.addEventListener('DOMContentLoaded', function () {
       var completeForm = document.getElementById('completeForm');
       var completeBtn = document.getElementById('confirmCompleteBtn');
       var completeCancelBtn = completeForm.querySelector('[data-bs-dismiss="modal"]');
-      var lessonField = document.getElementById('complete-lesson');
-      var componentError = document.getElementById('componentError');
 
-      // Override the click to store app names when fetching
-      var origFetch = window.fetch;
-      var searchInput = document.getElementById('appSearchInput');
-      var searchResults = document.getElementById('appSearchResults');
-
-      completeBtn.addEventListener('click', function (e) {
+      completeForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        // Validate at least one component selected
         var checkedComponents = completeForm.querySelectorAll('.component-checkbox:checked');
         if (checkedComponents.length === 0) {
-          componentError.style.display = 'block';
+          document.getElementById('componentError').style.display = 'block';
           return;
         }
-        componentError.style.display = 'none';
+        document.getElementById('componentError').style.display = 'none';
 
-        // Validate lesson_learned
+        var lessonField = document.getElementById('complete-lesson');
         if (!lessonField.value.trim()) {
           lessonField.setCustomValidity('Lesson Learned wajib diisi.');
           completeForm.reportValidity();
@@ -1148,83 +1224,108 @@
           return;
         }
 
-        // Prevent double submission
+        // Validate featureRequestId before proceeding
+        if (!featureRequestId || !Number.isFinite(featureRequestId) || !Number.isInteger(featureRequestId) || featureRequestId < 1) {
+          alert('ID permintaan tidak valid. Silakan tutup modal dan coba lagi.');
+          return;
+        }
+
         completeBtn.disabled = true;
         completeBtn.textContent = 'Menyimpan...';
         if (completeCancelBtn) completeCancelBtn.disabled = true;
 
         var formData = new FormData(completeForm);
 
-        // Append affected applications
-        selectedAppIds.forEach(function (app) {
-          formData.append('affected_application_ids[]', app.id);
+        // Collect checked app ids
+        var checkedApps = completeForm.querySelectorAll('.app-checkbox:checked');
+        checkedApps.forEach(function (cb) {
+          formData.append('affected_application_ids[]', cb.value);
         });
+
+        // Resilient CSRF token: meta tag → hidden _token input → error
+        var csrfToken = '';
+        try {
+          var metaTag = document.querySelector('meta[name="csrf-token"]');
+          if (metaTag) {
+            csrfToken = metaTag.getAttribute('content');
+          }
+        } catch (e) { /* meta tag not found */ }
+        if (!csrfToken) {
+          csrfToken = formData.get('_token') || '';
+        }
+        if (!csrfToken) {
+          alert('Token CSRF tidak ditemukan. Muat ulang halaman.');
+          resetCompleteBtn();
+          return;
+        }
 
         fetch(completeForm.action, {
           method: 'POST',
           body: formData,
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-              ? document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-              : formData.get('_token'),
-          },
+            'X-CSRF-TOKEN': csrfToken
+          }
         })
-          .then(function (response) {
-            if (response.ok) {
-              return response.json();
+        .then(function (response) {
+          if (response.ok) {
+            return response.json();
+          }
+          return response.json().then(function (err) {
+            var msg = 'Terjadi kesalahan validasi.';
+            if (err.errors) {
+              msg = Object.values(err.errors).map(function (e) { return e[0]; }).join('\n');
             }
-            return response.json().then(function (err) {
-              var msg = 'Terjadi kesalahan validasi.';
-              if (err.errors) {
-                msg = Object.values(err.errors).map(function (e) { return e[0]; }).join('\n');
-              } else if (err.message) {
-                msg = err.message;
-              }
-              throw new Error(msg);
-            });
-          })
-          .then(function (data) {
-            if (data.success) {
-              sessionStorage.setItem('toast_data', JSON.stringify({
-                type: 'success',
-                title: 'Success',
-                message: data.message,
-              }));
-              completeModal.hide();
-              window.location.reload();
-            } else {
-              alert(data.message || 'Terjadi kesalahan.');
-              resetCompleteBtn();
-            }
-          })
-          .catch(function (err) {
-            alert(err.message || 'Terjadi kesalahan jaringan. Silakan coba lagi.');
-            resetCompleteBtn();
+            throw new Error(msg);
           });
+        })
+        .then(function (data) {
+          if (data.success) {
+            sessionStorage.setItem('toast_data', JSON.stringify({
+              type: 'success',
+              title: 'Success',
+              message: data.message,
+            }));
+            completeModal.hide();
+            window.location.reload();
+          } else {
+            alert(data.message || 'Terjadi kesalahan.');
+            resetCompleteBtn();
+          }
+        })
+        .catch(function (err) {
+          alert(err.message || 'Terjadi kesalahan jaringan.');
+          resetCompleteBtn();
+        });
+
+        function resetCompleteBtn() {
+          completeBtn.disabled = false;
+          completeBtn.textContent = 'Selesai';
+          if (completeCancelBtn) completeCancelBtn.disabled = false;
+        }
       });
 
-      function resetCompleteBtn() {
+      document.getElementById('completeModal').addEventListener('hidden.bs.modal', function () {
+        completeForm.reset();
+        document.getElementById('componentError').style.display = 'none';
+        document.getElementById('addComponentFeedback').style.display = 'none';
+        document.getElementById('newComponentInput').value = '';
+        document.getElementById('appFilterInput').value = '';
         completeBtn.disabled = false;
         completeBtn.textContent = 'Selesai';
-        if (completeCancelBtn) completeCancelBtn.disabled = false;
-      }
-
-      var completeModalEl = document.getElementById('completeModal');
-      completeModalEl.addEventListener('hidden.bs.modal', function () {
-        completeForm.reset();
-        selectedAppIds = [];
-        renderSelectedApps();
-        componentError.style.display = 'none';
-        resetCompleteBtn();
-        // Reset modal title and button text
-        document.getElementById('completeModalLabel').textContent = 'Selesaikan Perubahan';
-        document.getElementById('confirmCompleteBtn').textContent = 'Selesai';
         // Remove _method input if present
         var methodInput = completeForm.querySelector('input[name="_method"]');
         if (methodInput) methodInput.remove();
       });
     });
+
+    /* ========== Helpers ========== */
+
+    function escapeHtml(text) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(text));
+      return div.innerHTML;
+    }
   </script>
 @endsection
 

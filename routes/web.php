@@ -20,6 +20,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/feature-requests/{featureRequest}/attachment', [FeatureRequestController::class, 'openAttachment'])->name('feature-requests.attachment');
     Route::get('/api/applications/search', [FeatureRequestController::class, 'searchApplications'])->name('api.applications.search');
     Route::get('/api/technical-components', [FeatureRequestController::class, 'getTechnicalComponents'])->name('api.technicalComponents');
+    Route::post('/api/technical-components', [FeatureRequestController::class, 'storeTechnicalComponent'])->name('api.technicalComponents.store');
     Route::get('/api/feature-requests/{featureRequest}/completed-data', [FeatureRequestController::class, 'getCompletedData'])->name('api.completedData');
     Route::put('/feature-requests/{featureRequest}/update-completed', [FeatureRequestController::class, 'updateCompleted'])->name('feature-requests.updateCompleted');
     Route::get('/add-application', [App\Http\Controllers\ApplicationController::class, 'create'])->name('applications.create');
