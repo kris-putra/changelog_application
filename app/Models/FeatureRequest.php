@@ -94,7 +94,7 @@ class FeatureRequest extends Model
 
     public function technicalComponents()
     {
-        return $this->belongsToMany(\App\Models\TechnicalComponent::class, 'feature_request_components', 'feature_request_id', 'technical_component_id');
+        return $this->belongsToMany(\App\Models\TechnicalComponent::class, 'feature_request_components', 'feature_request_id', 'technical_component_id')->withTimestamps();
     }
 
     public function affectedApplications()

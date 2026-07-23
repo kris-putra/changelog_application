@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class TechnicalComponent extends Model
 {
-    protected $fillable = ['name', 'display_order'];
+    protected $fillable = ['name'];
 
     public function featureRequests(): BelongsToMany
     {

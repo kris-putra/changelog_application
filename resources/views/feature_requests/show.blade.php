@@ -155,7 +155,7 @@
       <h5 class="mb-0 fw-bold" style="color: #e65100;">
         <i class="bi bi-check-circle me-2"></i>Data Penyelesaian
       </h5>
-      <button type="button" class="btn btn-sm btn-outline-primary" onclick="openEditCompleteModal({{ $requestItem->id }})">
+      <button type="button" class="btn btn-sm btn-outline-primary" onclick="CompleteModal.openEdit({{ $requestItem->id }})">
         <i class="bi bi-pencil me-1"></i>Edit
       </button>
     </div>
@@ -205,16 +205,24 @@
   </div>
   @endif
 
-  {{-- Complete Modal --}}
+  {{-- ======================================== --}}
+  {{-- Edit Completed Modal (shared implementation) --}}
+  {{-- ======================================== --}}
   <style>
     #completeModal .modal-dialog { max-width: 900px; width: 100%; }
+    #completeModal .twin-column-panel { display: flex; flex-direction: column; }
+    #completeModal .twin-column-panel .tc-panel-header { padding: 12px 16px; border-bottom: 1px solid #dee2e6; display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; }
+    #completeModal .twin-column-panel .tc-panel-header h6 { margin: 0; font-weight: 600; }
+    #completeModal .twin-column-panel .tc-panel-body { display: flex; flex-wrap: wrap; height: 330px; min-height: 0; }
+    #completeModal .twin-column-panel .tc-col-left,
+    #completeModal .twin-column-panel .tc-col-right { flex: 1 1 50%; min-width: 280px; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+    #completeModal .twin-column-panel .tc-col-header { padding: 8px 12px; font-weight: 600; border-bottom: 1px solid #e9ecef; flex-shrink: 0; font-size: 0.92rem; }
+    #completeModal .twin-column-panel .tc-col-body { flex: 1; min-height: 0; overflow: hidden; padding: 8px; display: flex; flex-direction: column; }
+    #completeModal .twin-column-panel .tc-scroll-area { flex: 1; min-height: 0; overflow-y: auto; }
+    #completeModal .twin-column-panel .tc-col-footer { padding: 8px 12px; border-top: 1px solid #e9ecef; flex-shrink: 0; }
+    #completeModal .twin-column-panel .tc-col-footer .form-control-sm { height: 28px; font-size: 0.82rem; padding: 2px 6px; }
     #completeModal .component-scroll-box,
     #completeModal .app-scroll-box {
-      height: 250px;
-      overflow-y: auto;
-      border: 1px solid #dee2e6;
-      border-radius: 0.375rem;
-      padding: 8px;
       background: #fff;
     }
     #completeModal .component-scroll-box .form-check,
@@ -226,8 +234,7 @@
       padding-top: 10px;
       border-top: 1px solid #dee2e6;
     }
-    #completeModal .component-error { color: #dc3545; font-size: 0.8rem; display: none; margin-top: 4px; }
-    #completeModal .app-filter-input { margin-bottom: 8px; }
+    #completeModal .add-component-feedback { }
     @media (max-width: 767.98px) {
       #completeModal .modal-dialog { max-width: calc(100vw - 1rem); margin: 0.5rem auto; }
     }
@@ -242,391 +249,68 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="row mb-3">
-              {{-- Left column: Technical Components --}}
-              <div class="col-md-6">
-                <label class="form-label fw-semibold">Komponen yang Diubah <span class="text-danger">*</span></label>
-                <div class="component-scroll-box" id="componentsScrollBox">
-                  <div class="text-muted small text-center py-2">Memuat komponen...</div>
-                </div>
-                <div class="component-error" id="componentError">Pilih minimal satu komponen.</div>
-
-                {{-- Add New Component --}}
-                <div class="add-component-section">
-                  <small class="fw-semibold text-muted">+ Tambah Komponen Baru</small>
-                  <div class="input-group input-group-sm mt-1">
-                    <input type="text" class="form-control" id="newComponentInput" placeholder="Nama komponen baru...">
-                    <button class="btn btn-outline-primary" type="button" id="addComponentBtn">Tambah</button>
-                  </div>
-                  <div id="addComponentFeedback" class="small mt-1" style="display: none;"></div>
-                </div>
+            <div class="twin-column-panel mb-3">
+              <div class="tc-panel-header">
+                <h6>Pilih Komponen & Aplikasi Terdampak</h6>
+                <div id="appCountBadge" class="small text-muted"></div>
               </div>
-
-              {{-- Right column: Affected Applications --}}
-              <div class="col-md-6">
-                <label class="form-label fw-semibold">Aplikasi Terdampak</label>
-                <div id="noApplicationsMsg" class="text-muted small mb-2" style="display: none;">Tidak ada aplikasi yang tersedia.</div>
-                <div id="appSearchContainer">
-                  <input type="text" class="form-control form-control-sm app-filter-input" id="appFilterInput"
-                         placeholder="Cari aplikasi..." autocomplete="off">
-                  <div class="app-scroll-box" id="appsScrollBox">
-                    <div class="text-muted small text-center py-2">Memuat aplikasi...</div>
+              <div class="tc-panel-body">
+                <div class="tc-col-left">
+                  <div class="tc-col-header d-flex justify-content-between align-items-center">
+                    <span>Komponen <span class="text-danger">*</span></span>
+                  </div>
+                  <div class="tc-col-body">
+                    <div class="tc-scroll-area component-scroll-box" id="componentsScrollBox">
+                      <div class="text-muted small text-center py-2">Memuat komponen...</div>
+                    </div>
+                  </div>
+                  <div class="tc-col-footer">
+                    <div class="add-component-section" style="margin-top:0;padding-top:0;border-top:none;">
+                      <small class="fw-semibold text-muted">+ Tambah Komponen Baru</small>
+                      <div class="input-group input-group-sm mt-1">
+                        <input type="text" class="form-control form-control-sm" id="newComponentInput" placeholder="Nama komponen baru...">
+                        <button class="btn btn-outline-primary btn-sm" type="button" id="addComponentBtn">Tambah Komponen</button>
+                      </div>
+                      <div id="addComponentFeedback" class="add-component-feedback small mt-1" style="display: none;"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tc-col-right">
+                  <div class="tc-col-header d-flex justify-content-between align-items-center">
+                    <span>Aplikasi Terdampak</span>
+                  </div>
+                  <div class="tc-col-body">
+                    <div id="noApplicationsMsg" class="text-muted small mb-2" style="display: none;">Tidak ada aplikasi yang tersedia.</div>
+                    <div id="appSearchContainer">
+                      <input type="text" class="form-control form-control-sm mb-2" id="appFilterInput"
+                             placeholder="Cari aplikasi..." autocomplete="off">
+                      <div class="tc-scroll-area app-scroll-box" id="appsScrollBox">
+                        <div class="text-muted small text-center py-2">Memuat aplikasi...</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="mb-3">
-              <label for="complete-lesson" class="form-label fw-semibold">Lesson Learned <span class="text-danger">*</span></label>
-              <textarea class="form-control" id="complete-lesson" name="lesson_learned" rows="4" placeholder="Tuliskan pembelajaran, kendala, atau rekomendasi setelah perubahan selesai." required></textarea>
+            <div class="mb-0">
+              <label for="complete-lesson" class="form-label fw-semibold mb-1">Lesson Learned <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="complete-lesson" name="lesson_learned" rows="3" placeholder="Tuliskan pembelajaran, kendala, atau rekomendasi setelah perubahan selesai." required></textarea>
             </div>
+            <div class="component-error text-danger small mt-1" id="componentError" style="display: none;">Pilih minimal satu komponen.</div>
           </div>
           <div class="modal-footer justify-content-end">
             <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-success px-4" id="confirmCompleteBtn">Simpan Perubahan</button>
+            <button type="submit" class="btn btn-success px-4" id="confirmCompleteBtn">Selesai</button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
+  <script src="{{ asset('js/complete-modal.js') }}"></script>
   <script>
-    var completeModal = null;
-    var allApplications = [];
-    var technicalComponentsLoaded = false;
-
-    /* ========== Technical Components ========== */
-
-    function loadTechnicalComponents(callback) {
-      if (technicalComponentsLoaded) { if (callback) callback(); return; }
-      fetch('/api/technical-components')
-        .then(function (res) { return res.json(); })
-        .then(function (components) {
-          renderComponentsList(components);
-          technicalComponentsLoaded = true;
-          if (callback) callback();
-        })
-        .catch(function () {
-          document.getElementById('componentsScrollBox').innerHTML = '<div class="text-danger small">Gagal memuat komponen.</div>';
-        });
-    }
-
-    function renderComponentsList(components) {
-      var box = document.getElementById('componentsScrollBox');
-      box.innerHTML = '';
-      if (components.length === 0) {
-        box.innerHTML = '<div class="text-muted small text-center py-2">Belum ada komponen.</div>';
-        return;
-      }
-      components.forEach(function (comp) {
-        var div = document.createElement('div');
-        div.className = 'form-check';
-        var slug = comp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        div.innerHTML =
-          '<input class="form-check-input component-checkbox" type="checkbox" name="technical_component_ids[]" value="' + comp.id + '" id="comp-' + slug + '">' +
-          '<label class="form-check-label" for="comp-' + slug + '">' + escapeHtml(comp.name) + '</label>';
-        box.appendChild(div);
-      });
-    }
-
-    /* ========== Add New Component ========== */
-
     document.addEventListener('DOMContentLoaded', function () {
-      var addBtn = document.getElementById('addComponentBtn');
-      var addInput = document.getElementById('newComponentInput');
-      var feedback = document.getElementById('addComponentFeedback');
-
-      addBtn.addEventListener('click', function () { addNewComponent(); });
-      addInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); addNewComponent(); }
-      });
-
-      function addNewComponent() {
-        var name = addInput.value.trim();
-        if (!name) {
-          feedback.style.display = 'block';
-          feedback.className = 'small mt-1 text-danger';
-          feedback.textContent = 'Nama komponen tidak boleh kosong.';
-          return;
-        }
-
-        addBtn.disabled = true;
-        addBtn.textContent = '...';
-
-        fetch('/api/technical-components', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-          },
-          body: JSON.stringify({ name: name })
-        })
-        .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
-        .then(function (result) {
-          if (result.ok && result.data.success) {
-            var comp = result.data;
-            // Append to list and check it
-            var box = document.getElementById('componentsScrollBox');
-            var placeholder = box.querySelector('.text-muted.text-center');
-            if (placeholder) placeholder.remove();
-
-            var div = document.createElement('div');
-            div.className = 'form-check';
-            var slug = comp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            div.innerHTML =
-              '<input class="form-check-input component-checkbox" type="checkbox" name="technical_component_ids[]" value="' + comp.id + '" id="comp-' + slug + '" checked>' +
-              '<label class="form-check-label" for="comp-' + slug + '">' + escapeHtml(comp.name) + '</label>';
-            box.appendChild(div);
-
-            // Sort the list alphabetically
-            sortComponentsList();
-
-            addInput.value = '';
-            feedback.style.display = 'block';
-            feedback.className = 'small mt-1 text-success';
-            feedback.textContent = '"' + comp.name + '" berhasil ditambahkan.';
-            setTimeout(function () { feedback.style.display = 'none'; }, 3000);
-
-            // Invalidate cache so next load picks it up
-            technicalComponentsLoaded = false;
-          } else {
-            feedback.style.display = 'block';
-            feedback.className = 'small mt-1 text-danger';
-            feedback.textContent = result.data.message || 'Gagal menambahkan komponen.';
-          }
-        })
-        .catch(function () {
-          feedback.style.display = 'block';
-          feedback.className = 'small mt-1 text-danger';
-          feedback.textContent = 'Terjadi kesalahan jaringan.';
-        })
-        .finally(function () {
-          addBtn.disabled = false;
-          addBtn.textContent = 'Tambah';
-        });
-      }
-
-      function sortComponentsList() {
-        var box = document.getElementById('componentsScrollBox');
-        var checks = Array.from(box.querySelectorAll('.form-check'));
-        checks.sort(function (a, b) {
-          var nameA = a.querySelector('label').textContent.toLowerCase();
-          var nameB = b.querySelector('label').textContent.toLowerCase();
-          return nameA.localeCompare(nameB);
-        });
-        checks.forEach(function (el) { box.appendChild(el); });
-      }
+      CompleteModal.init();
     });
-
-    /* ========== Affected Applications ========== */
-
-    function loadAllApplications(callback) {
-      fetch('/api/applications/search?q=')
-        .then(function (res) { return res.json(); })
-        .then(function (apps) {
-          allApplications = apps.sort(function (a, b) { return a.name.localeCompare(b.name); });
-          renderApplicationsList(allApplications);
-          var noMsg = document.getElementById('noApplicationsMsg');
-          var container = document.getElementById('appSearchContainer');
-          if (allApplications.length === 0) {
-            noMsg.style.display = 'block';
-            container.style.display = 'none';
-          } else {
-            noMsg.style.display = 'none';
-            container.style.display = 'block';
-          }
-          if (callback) callback();
-        })
-        .catch(function () {
-          document.getElementById('appsScrollBox').innerHTML = '<div class="text-danger small">Gagal memuat aplikasi.</div>';
-        });
-    }
-
-    function renderApplicationsList(apps) {
-      var box = document.getElementById('appsScrollBox');
-      box.innerHTML = '';
-      if (apps.length === 0) {
-        box.innerHTML = '<div class="text-muted small text-center py-2">Tidak ditemukan.</div>';
-        return;
-      }
-      apps.forEach(function (app) {
-        var div = document.createElement('div');
-        div.className = 'form-check';
-        div.setAttribute('data-app-name', app.name.toLowerCase());
-        var slug = app.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        div.innerHTML =
-          '<input class="form-check-input app-checkbox" type="checkbox" value="' + app.id + '" id="app-' + slug + '" data-app-name="' + escapeHtml(app.name) + '">' +
-          '<label class="form-check-label" for="app-' + slug + '">' + escapeHtml(app.name) + '</label>';
-        box.appendChild(div);
-      });
-    }
-
-    // App filter
-    document.addEventListener('DOMContentLoaded', function () {
-      var filterInput = document.getElementById('appFilterInput');
-      filterInput.addEventListener('input', function () {
-        var query = this.value.trim().toLowerCase();
-        var checks = document.querySelectorAll('#appsScrollBox .form-check');
-        checks.forEach(function (div) {
-          var appName = div.getAttribute('data-app-name') || '';
-          if (query === '' || appName.indexOf(query) !== -1) {
-            div.style.display = '';
-          } else {
-            div.style.display = 'none';
-          }
-        });
-      });
-    });
-
-    /* ========== Open Edit Complete Modal ========== */
-
-    function openEditCompleteModal(id) {
-      var form = document.getElementById('completeForm');
-      form.action = '/feature-requests/' + id + '/update-completed';
-
-      var methodInput = form.querySelector('input[name="_method"]');
-      if (!methodInput) {
-        methodInput = document.createElement('input');
-        methodInput.type = 'hidden';
-        methodInput.name = '_method';
-        form.appendChild(methodInput);
-      }
-      methodInput.value = 'PUT';
-
-      document.getElementById('componentError').style.display = 'none';
-      document.getElementById('appFilterInput').value = '';
-      document.getElementById('complete-lesson').value = '';
-
-      // Reset add component feedback
-      var feedback = document.getElementById('addComponentFeedback');
-      feedback.style.display = 'none';
-      document.getElementById('newComponentInput').value = '';
-
-      fetch('/api/feature-requests/' + id + '/completed-data')
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-          document.getElementById('complete-lesson').value = data.lesson_learned || '';
-
-          // Load components
-          technicalComponentsLoaded = false;
-          document.getElementById('componentsScrollBox').innerHTML = '<div class="text-muted small text-center py-2">Memuat komponen...</div>';
-          loadTechnicalComponents(function () {
-            var compIds = data.technical_component_ids || [];
-            compIds.forEach(function (cid) {
-              var cb = document.querySelector('#componentsScrollBox input[value="' + cid + '"]');
-              if (cb) cb.checked = true;
-            });
-          });
-
-          // Load applications
-          document.getElementById('appsScrollBox').innerHTML = '<div class="text-muted small text-center py-2">Memuat aplikasi...</div>';
-          loadAllApplications(function () {
-            var appIds = data.affected_application_ids || [];
-            appIds.forEach(function (aid) {
-              var cb = document.querySelector('#appsScrollBox input[value="' + aid + '"]');
-              if (cb) cb.checked = true;
-            });
-          });
-        });
-
-      if (!completeModal) {
-        completeModal = new bootstrap.Modal(document.getElementById('completeModal'));
-      }
-      completeModal.show();
-    }
-
-    /* ========== Form Submission ========== */
-
-    document.addEventListener('DOMContentLoaded', function () {
-      var completeForm = document.getElementById('completeForm');
-      var completeBtn = document.getElementById('confirmCompleteBtn');
-
-      completeForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        var checkedComponents = completeForm.querySelectorAll('.component-checkbox:checked');
-        if (checkedComponents.length === 0) {
-          document.getElementById('componentError').style.display = 'block';
-          return;
-        }
-        document.getElementById('componentError').style.display = 'none';
-
-        var lessonField = document.getElementById('complete-lesson');
-        if (!lessonField.value.trim()) {
-          lessonField.setCustomValidity('Lesson Learned wajib diisi.');
-          completeForm.reportValidity();
-          lessonField.setCustomValidity('');
-          return;
-        }
-
-        completeBtn.disabled = true;
-        completeBtn.textContent = 'Menyimpan...';
-
-        var formData = new FormData(completeForm);
-
-        // Collect checked app ids
-        var checkedApps = completeForm.querySelectorAll('.app-checkbox:checked');
-        checkedApps.forEach(function (cb) {
-          formData.append('affected_application_ids[]', cb.value);
-        });
-
-        fetch(completeForm.action, {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-          }
-        })
-        .then(function (response) {
-          if (response.ok) {
-            return response.json();
-          }
-          return response.json().then(function (err) {
-            var msg = 'Terjadi kesalahan validasi.';
-            if (err.errors) {
-              msg = Object.values(err.errors).map(function (e) { return e[0]; }).join('\n');
-            }
-            throw new Error(msg);
-          });
-        })
-        .then(function (data) {
-          if (data.success) {
-            completeModal.hide();
-            window.location.reload();
-          } else {
-            alert(data.message || 'Terjadi kesalahan.');
-            resetBtn();
-          }
-        })
-        .catch(function (err) {
-          alert(err.message || 'Terjadi kesalahan jaringan.');
-          resetBtn();
-        });
-
-        function resetBtn() {
-          completeBtn.disabled = false;
-          completeBtn.textContent = 'Simpan Perubahan';
-        }
-      });
-
-      document.getElementById('completeModal').addEventListener('hidden.bs.modal', function () {
-        completeForm.reset();
-        document.getElementById('componentError').style.display = 'none';
-        document.getElementById('addComponentFeedback').style.display = 'none';
-        document.getElementById('newComponentInput').value = '';
-        document.getElementById('appFilterInput').value = '';
-        completeBtn.disabled = false;
-        completeBtn.textContent = 'Simpan Perubahan';
-      });
-    });
-
-    /* ========== Helpers ========== */
-
-    function escapeHtml(text) {
-      var div = document.createElement('div');
-      div.appendChild(document.createTextNode(text));
-      return div.innerHTML;
-    }
   </script>
 @endsection
