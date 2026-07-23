@@ -35,8 +35,9 @@
           <label class="form-label small fw-semibold text-muted mb-1">Tipe</label>
           <select class="form-select form-select-sm" id="filterType">
             <option value="">Semua Tipe</option>
-            <option value="Feature">Feature</option>
-            <option value="Incident">Incident</option>
+            @foreach($types as $type)
+              <option value="{{ ucfirst($type) }}">{{ ucfirst($type) }}</option>
+            @endforeach
           </select>
         </div>
         <div class="col-md-3">

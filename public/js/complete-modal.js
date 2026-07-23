@@ -387,13 +387,15 @@
       }
     })
     .then(function (response) {
-      if (response.ok) { return response.json(); }
-      return response.json().then(function (err) {
-        var msg = 'Terjadi kesalahan validasi.';
-        if (err.errors) {
-          msg = Object.values(err.errors).map(function (e) { return e[0]; }).join('\n');
+      return response.json().then(function (data) {
+        if (!response.ok) {
+          var msg = 'Terjadi kesalahan validasi.';
+          if (data.errors) {
+            msg = Object.values(data.errors).map(function (e) { return e[0]; }).join('\n');
+          }
+          throw new Error(msg);
         }
-        throw new Error(msg);
+        return data;
       });
     })
     .then(function (data) {

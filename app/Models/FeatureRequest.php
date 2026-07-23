@@ -33,6 +33,8 @@ class FeatureRequest extends Model
         'urgent' => 'UR',
     ];
 
+    public const TYPES = ['feature', 'change', 'bug', 'incident'];
+
     private static array $typeMap = [
         'feature' => 'FE',
         'change' => 'CH',

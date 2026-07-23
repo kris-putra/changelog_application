@@ -111,10 +111,12 @@ class DashboardController extends Controller
 
         $requests = $query->limit(15)->get();
 
+        $allTypes = FeatureRequest::TYPES;
+
         return view('dashboard', compact(
             'totalRequests', 'openCount', 'inProgressCount', 'completedCount', 'requests',
             'sort', 'order', 'cycle', 'cycleLabels', 'totalApplications', 'applications'
-        ));
+        ) + ['types' => $allTypes]);
 
     }
 }
